@@ -1,0 +1,17 @@
+<launch>
+<node pkg="map_generator" name="random_map_node" type="random_map_node" output="screen">
+    <param name="init_x" value="10"/>
+    <param name="init_y" value="10"/>
+    <param name="map/x_size" value="50"/>
+    <param name="map/y_size" value="50"/>
+    <param name="map/obs_num" value="200"/>
+    <param name="map/resolution" value="0.1"/>
+    <param name="ObstacleShape/lower_rad" value="0.3"/>
+    <param name="ObstacleShape/upper_rad" value="0.8"/>
+    <param name="sensing/radius" value="5"/>
+    <param name="is_use_pcd_map" value = "true"/>
+    <param name="pcd_map_path" value = "$(find map_generator)/map/laser_shunwei.pcd"/>
+
+</node>
+<!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find map_generator)/rviz/random_map.rviz" /> -->
+</launch>
