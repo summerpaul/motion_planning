@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-08-04 19:07:20
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-05 09:12:07
+ * @Last Modified time: 2022-09-23 16:21:51
  */
 #include "map_generator/random_map.h"
 
@@ -73,6 +73,7 @@ void RandomMap::clickCallback(const geometry_msgs::PointStamped &msg) {
   x = floor(x / resolution_) * resolution_ + resolution_ / 2.0;
   y = floor(y / resolution_) * resolution_ + resolution_ / 2.0;
 
+  // 随机的宽度
   int widNum = ceil(w / resolution_);
 
   for (int r = -widNum / 2.0; r < widNum / 2.0; r++)

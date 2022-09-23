@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-23 14:42:37
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-23 15:57:37
+ * @Last Modified time: 2022-09-23 18:32:46
  */
 #include <stdint.h>
 
@@ -75,6 +75,7 @@ public:
     data_.assign(width_ * height_, 0);
     // 膨胀地图
     int inf_step = ceil(robot_radius / resolution_);
+
     for (auto point : cloud.points) {
       int i = (point.x - root_x_) / resolution_;
       if (i < 0 || i > width_ - 1)
