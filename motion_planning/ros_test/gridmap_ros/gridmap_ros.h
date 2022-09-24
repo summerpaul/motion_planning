@@ -8,13 +8,18 @@
 
 #ifndef __GRIDMAP_ROS_H__
 #define __GRIDMAP_ROS_H__
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
-#include "plan_environment/grid_map.h"
+
 #include <fstream>
+
+#include "common/common.h"
+#include "plan_environment/grid_map.h"
 using namespace motion_planning::plan_environment;
+using namespace motion_planning::common;
 class GridmapRos {
  public:
   GridmapRos();
@@ -26,6 +31,9 @@ class GridmapRos {
   void localPcdMapCallback(const sensor_msgs::PointCloud2::ConstPtr& pcd_map);
   void globalPcdMapCallback(const sensor_msgs::PointCloud2::ConstPtr& pcd_map);
 
+  void rvizPoseCallback(
+      const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
+
  private:
   GridMap::Ptr global_gridmap_ptr_;
   GridMap::Ptr local_gridmap_ptr_;
@@ -36,6 +44,7 @@ class GridmapRos {
   ros::Subscriber global_pcd_map_sub_;
   ros::Publisher local_occupancy_grid_map_pub_;
   ros::Publisher global_occupancy_grid_map_pub_;
+  ros::Subscriber click_pose_sub_;
   bool save_global_map_ = false;
   std::string map_path_;
 };

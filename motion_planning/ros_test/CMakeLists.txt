@@ -1,3 +1,4 @@
 project(ros_test)
 
 add_subdirectory(gridmap_ros)
+add_subdirectory(astar_search_grid_map_ros)

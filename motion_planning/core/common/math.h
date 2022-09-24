@@ -5,8 +5,8 @@
  * @Last Modified time: 2022-09-23 15:49:34
  */
 
-#ifndef __MATH_H__
-#define __MATH_H__
+#ifndef MOTION_PLANNING__MATH_H_
+#define MOTION_PLANNING__MATH_H_
 #include <cmath>
 // 基本数学工具
 namespace motion_planning {

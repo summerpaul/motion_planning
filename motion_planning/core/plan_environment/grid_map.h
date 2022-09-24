@@ -6,8 +6,8 @@
  */
 #include <stdint.h>
 
-#ifndef __GRID_MAP_H__
-#define __GRID_MAP_H__
+#ifndef MOTION_PLANNING_GRID_MAP_H_
+#define MOTION_PLANNING_GRID_MAP_H_
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
@@ -37,7 +37,7 @@ cv::Mat convertVector2Mat(std::vector<_Tp> v, int channels, int rows) {
 class GridMap {
  public:
   // cv map转gridmap
-  void createGridmap(const cv::Mat &mat, const double &root_x,
+  void createGridMap(const cv::Mat &mat, const double &root_x,
                      const double &root_y, const double &root_theta,
                      const double &resolution = 0.05,
                      const double &robot_radius = 0.3) {
@@ -57,7 +57,7 @@ class GridMap {
     data_ = convertMat2Vector<uchar>(mat_fliped);
   }
   //   点云转栅格地图
-  void createGridmap(const pcl::PointCloud<pcl::PointXYZ> &cloud,
+  void createGridMap(const pcl::PointCloud<pcl::PointXYZ> &cloud,
                      const double &resolution = 0.05,
                      const double &robot_radius = 0.3) {
     resolution_ = resolution;
@@ -151,21 +151,29 @@ class GridMap {
   bool isOccupied(const Eigen::Vector2i &index) const {
     return isOccupied(getIndex(index));
   }
+  bool isVerify(const Eigen::Vector2i &index) const {
+    if (index[0] >= 0 && index[0] < width_ && index[1] >= 0 &&
+        index[1] < height_)
+      return true;
+    else
+      return false;
+  }
   // 需要进行坐标系变换，规划使用index的坐标系从0，0，0开始
   //   pose是从root_x, root_y, root_theta开始
+  // 
   Eigen::Vector2i getGridMapIndex(const Eigen::Vector2d &pose) const {
     double x = (pose[0] - root_x_) * cos(root_theta_) +
                (pose[1] - root_y_) * sin(root_theta_);
     double y = -(pose[0] - root_x_) * sin(root_theta_) +
                (pose[1] - root_y_) * cos(root_theta_);
-    return Eigen::Vector2i(x / resolution_, y / resolution_);
+    return Eigen::Vector2i( int(x / resolution_),int(y / resolution_));
   }
 
   Eigen::Vector2d getCartesianCoordinate(const Eigen::Vector2i &index) const {
     double x = root_x_ + index[0] * resolution_ * cos(root_theta_) -
                index[1] * resolution_ * sin(root_theta_);
     double y = root_y_ + index[0] * resolution_ * sin(root_theta_) +
-               index[1] * cos(root_theta_);
+               index[1]* resolution_ * cos(root_theta_);
 
     return Eigen::Vector2d(x, y);
   }

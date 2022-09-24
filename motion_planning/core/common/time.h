@@ -6,8 +6,8 @@
  */
 #include <stdint.h>
 
-#ifndef __TIME_H__
-#define __TIME_H__
+#ifndef MOTION_PLANNING_TIME_H_
+#define MOTION_PLANNING_TIME_H_
 #include <chrono>
 #include <ostream>
 #include <ratio>

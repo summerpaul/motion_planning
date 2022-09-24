@@ -35,6 +35,9 @@ bool GridmapRos::init() {
       local_occupancy_grid_map_topic_name, 1);
   global_occupancy_grid_map_pub_ = nh_.advertise<nav_msgs::OccupancyGrid>(
       global_occupancy_grid_map_topic_name, 1);
+
+  click_pose_sub_ =
+      nh_.subscribe("/initialpose", 50, &GridmapRos::rvizPoseCallback, this);
   return true;
 }
 void GridmapRos::localPcdMapCallback(
@@ -46,7 +49,7 @@ void GridmapRos::localPcdMapCallback(
   if (!local_gridmap_ptr_) {
     local_gridmap_ptr_ = std::make_shared<GridMap>();
   }
-  local_gridmap_ptr_->createGridmap(cloud, 0.05, 0.5);
+  local_gridmap_ptr_->createGridMap(cloud, 0.05, 0.5);
   auto msg = gridmaptoRosMessage(*local_gridmap_ptr_);
   local_occupancy_grid_map_pub_.publish(msg);
 }
@@ -59,7 +62,11 @@ void GridmapRos::globalPcdMapCallback(
   if (!global_gridmap_ptr_) {
     global_gridmap_ptr_ = std::make_shared<GridMap>();
   }
-  global_gridmap_ptr_->createGridmap(cloud, 0.05, 0.5);
+  static bool is_create_grid_map{false};
+  if (!is_create_grid_map) {
+    global_gridmap_ptr_->createGridMap(cloud);
+    is_create_grid_map = true;
+  }
   auto msg = gridmaptoRosMessage(*global_gridmap_ptr_);
   global_occupancy_grid_map_pub_.publish(msg);
   static bool saved_map = false;
@@ -104,4 +111,23 @@ nav_msgs::OccupancyGrid GridmapRos::gridmaptoRosMessage(
   occupancy_grid.info.height = gridmap.getHeight();
   occupancy_grid.info.origin = pose;
   return occupancy_grid;
+}
+void GridmapRos::rvizPoseCallback(
+    const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg) {
+  if (!global_gridmap_ptr_) {
+    std::cout << "global_gridmap_ptr_ is empty" << std::endl;
+    return;
+  }
+  VehicleState pose;
+  pose.position[0] = msg->pose.pose.position.x;
+  pose.position[1] = msg->pose.pose.position.y;
+  std::cout << "click pose is " << pose.position << std::endl;
+  Eigen::Vector2i index = global_gridmap_ptr_->getGridMapIndex(pose.position);
+  std::cout << "index is " << index << std::endl;
+  std::cout << "index  Verify is" << global_gridmap_ptr_->isVerify(index)
+            << std::endl;
+  std::cout << "index  Occupied is" << global_gridmap_ptr_->isOccupied(index)
+            << std::endl;
+  Eigen::Vector2d pose_in_map = global_gridmap_ptr_->getCartesianCoordinate(index);
+  std::cout << "pose_in_map is " << pose_in_map << std::endl;
 }
