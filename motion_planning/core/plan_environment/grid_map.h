@@ -8,22 +8,34 @@
 
 #ifndef __GRID_MAP_H__
 #define __GRID_MAP_H__
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+
 #include <Eigen/Eigen>
 #include <memory>
 #include <opencv2/opencv.hpp>
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
 #include <vector>
 
 namespace motion_planning {
 namespace plan_environment {
 
-template <typename _Tp> std::vector<_Tp> convertMat2Vector(const cv::Mat &mat) {
-  return (std::vector<_Tp>)(mat.reshape(1, 1)); //通道数不变，按行转为一行
+/***************** Mat转vector **********************/
+template <typename _Tp>
+std::vector<_Tp> convertMat2Vector(const cv::Mat &mat) {
+  return (std::vector<_Tp>)(mat.reshape(1, 1));  //通道数不变，按行转为一行
+}
+
+/****************** vector转Mat *********************/
+template <typename _Tp>
+cv::Mat convertVector2Mat(std::vector<_Tp> v, int channels, int rows) {
+  cv::Mat mat = cv::Mat(v);  //将vector变成单列的mat
+  cv::Mat dest =
+      mat.reshape(channels, rows).clone();  // PS：必须clone()一份，否则返回出错
+  return dest;
 }
 
 class GridMap {
-public:
+ public:
   // cv map转gridmap
   void createGridmap(const cv::Mat &mat, const double &root_x,
                      const double &root_y, const double &root_theta,
@@ -78,21 +90,24 @@ public:
 
     for (auto point : cloud.points) {
       int i = (point.x - root_x_) / resolution_;
-      if (i < 0 || i > width_ - 1)
-        continue;
+      if (i < 0 || i > width_ - 1) continue;
       int j = (point.y - root_y_) / resolution_;
-      if (j < 0 || j > height_ - 1)
-        continue;
+      if (j < 0 || j > height_ - 1) continue;
       for (int x = -inf_step; x <= inf_step; ++x)
         for (int y = -inf_step; y <= inf_step; ++y) {
-          if (i + x < 0 || i + x > width_ - 1)
-            continue;
-          if (j + y < 0 || j + y > height_ - 1)
-            continue;
+          if (i + x < 0 || i + x > width_ - 1) continue;
+          if (j + y < 0 || j + y > height_ - 1) continue;
           data_[i + x + (j + y) * width_] = 255;
         }
     }
   }
+  // 转换为图像
+  cv::Mat toImage() const {
+    cv::Mat image = convertVector2Mat<uchar>(data_, 1, height_);
+    cv::Mat image_fliped;
+    cv::flip(image, image_fliped, 0);
+    return image_fliped;
+  };
 
   int getWidth() const { return width_; }
 
@@ -155,7 +170,7 @@ public:
     return Eigen::Vector2d(x, y);
   }
 
-private:
+ private:
   int width_;
   int height_;
   double resolution_;
@@ -167,10 +182,10 @@ private:
   Eigen::Vector2i map_size_2i_;
   Eigen::Vector2d origin_;
 
-public:
+ public:
   typedef std::shared_ptr<GridMap> Ptr;
 };
 
-} // namespace plan_environment
-} // namespace motion_planning
+}  // namespace plan_environment
+}  // namespace motion_planning
 #endif /* __GRID_MAP_H__ */

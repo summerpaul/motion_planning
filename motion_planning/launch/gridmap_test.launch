@@ -4,6 +4,9 @@
     <param name="global_pcd_map_topic_name" value="/map_generator/global_cloud"/>
     <param name="local_occupancy_grid_map_topic_name" value="/local_occupancy_grid_map"/>
     <param name="global_occupancy_grid_map_topic_name" value="/global_occupancy_grid_map"/>
+    <param name="save_global_map" value="true"/>
+    <param name="map_path" value="$(find map_generator)/map"/>
+    
 
 </node>
 <include file="$(find map_generator)/launch/random_map_generation.launch"/>

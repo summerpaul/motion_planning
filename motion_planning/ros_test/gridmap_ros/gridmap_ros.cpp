@@ -24,6 +24,9 @@ bool GridmapRos::init() {
   pnh_.param<std::string>("global_occupancy_grid_map_topic_name",
                           global_occupancy_grid_map_topic_name,
                           "/global_occupancy_grid_map");
+
+  pnh_.param<bool>("save_global_map", save_global_map_, false);
+  pnh_.param<std::string>("map_path", map_path_, "");
   local_pcd_map_sub_ = nh_.subscribe(local_pcd_map_topic_name, 50,
                                      &GridmapRos::localPcdMapCallback, this);
   global_pcd_map_sub_ = nh_.subscribe(global_pcd_map_topic_name, 50,
@@ -40,8 +43,11 @@ void GridmapRos::localPcdMapCallback(
   pcl::PCLPointCloud2 pcl_pc;
   pcl_conversions::toPCL(*pcd_map, pcl_pc);
   pcl::fromPCLPointCloud2(pcl_pc, cloud);
-  gridmap_.createGridmap(cloud, 0.05, 0.5);
-  auto msg = gridmaptoRosMessage(gridmap_);
+  if (!local_gridmap_ptr_) {
+    local_gridmap_ptr_ = std::make_shared<GridMap>();
+  }
+  local_gridmap_ptr_->createGridmap(cloud, 0.05, 0.5);
+  auto msg = gridmaptoRosMessage(*local_gridmap_ptr_);
   local_occupancy_grid_map_pub_.publish(msg);
 }
 void GridmapRos::globalPcdMapCallback(
@@ -50,9 +56,28 @@ void GridmapRos::globalPcdMapCallback(
   pcl::PCLPointCloud2 pcl_pc;
   pcl_conversions::toPCL(*pcd_map, pcl_pc);
   pcl::fromPCLPointCloud2(pcl_pc, cloud);
-  gridmap_.createGridmap(cloud, 0.05, 0.5);
-  auto msg = gridmaptoRosMessage(gridmap_);
+  if (!global_gridmap_ptr_) {
+    global_gridmap_ptr_ = std::make_shared<GridMap>();
+  }
+  global_gridmap_ptr_->createGridmap(cloud, 0.05, 0.5);
+  auto msg = gridmaptoRosMessage(*global_gridmap_ptr_);
   global_occupancy_grid_map_pub_.publish(msg);
+  static bool saved_map = false;
+  if (save_global_map_ && !saved_map) {
+    auto map = global_gridmap_ptr_->toImage();
+    std::string map_path = map_path_ + "/map.jpg";
+    cv::imwrite(map_path, map);
+    saved_map = true;
+    std::ofstream ofs(map_path_ + "/map.yaml");
+    ofs << "image: map.png" << std::endl;
+    ofs << "resolution: " << global_gridmap_ptr_->getResolution() << std::endl;
+    ofs << "origin: [" << global_gridmap_ptr_->getRootX() << ", "
+        << global_gridmap_ptr_->getRootY() << ", "
+        << global_gridmap_ptr_->getRootTheta() << "]" << std::endl;
+    ofs << "occupied_thresh: 0.5" << std::endl;
+    ofs << "free_thresh: 0.2" << std::endl;
+    ofs << "negate: 0" << std::endl;
+  }
 }
 nav_msgs::OccupancyGrid GridmapRos::gridmaptoRosMessage(
     const GridMap& gridmap) {
