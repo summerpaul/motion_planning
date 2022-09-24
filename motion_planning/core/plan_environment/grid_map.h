@@ -139,6 +139,11 @@ class GridMap {
     return index[0] + index[1] * width_;
   }
 
+  int getIndex(const Eigen::Vector2d &pos) const {
+    Eigen::Vector2i eigen_index = getGridMapIndex(pos);
+    return getIndex(eigen_index);
+  }
+
   void set(size_t index, uchar value) { data_[index] = value; }
 
   bool isOccupied(int index) const {
@@ -151,6 +156,7 @@ class GridMap {
   bool isOccupied(const Eigen::Vector2i &index) const {
     return isOccupied(getIndex(index));
   }
+
   bool isVerify(const Eigen::Vector2i &index) const {
     if (index[0] >= 0 && index[0] < width_ && index[1] >= 0 &&
         index[1] < height_)
@@ -160,20 +166,20 @@ class GridMap {
   }
   // 需要进行坐标系变换，规划使用index的坐标系从0，0，0开始
   //   pose是从root_x, root_y, root_theta开始
-  // 
+  //
   Eigen::Vector2i getGridMapIndex(const Eigen::Vector2d &pose) const {
     double x = (pose[0] - root_x_) * cos(root_theta_) +
                (pose[1] - root_y_) * sin(root_theta_);
     double y = -(pose[0] - root_x_) * sin(root_theta_) +
                (pose[1] - root_y_) * cos(root_theta_);
-    return Eigen::Vector2i( int(x / resolution_),int(y / resolution_));
+    return Eigen::Vector2i(int(x / resolution_), int(y / resolution_));
   }
 
   Eigen::Vector2d getCartesianCoordinate(const Eigen::Vector2i &index) const {
     double x = root_x_ + index[0] * resolution_ * cos(root_theta_) -
                index[1] * resolution_ * sin(root_theta_);
     double y = root_y_ + index[0] * resolution_ * sin(root_theta_) +
-               index[1]* resolution_ * cos(root_theta_);
+               index[1] * resolution_ * cos(root_theta_);
 
     return Eigen::Vector2d(x, y);
   }
@@ -192,6 +198,7 @@ class GridMap {
 
  public:
   typedef std::shared_ptr<GridMap> Ptr;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 }  // namespace plan_environment

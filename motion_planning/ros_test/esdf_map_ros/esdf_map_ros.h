@@ -1,13 +1,5 @@
-/**
- * @Author: Yunkai Xia
- * @Date:   2022-08-24 10:07:24
- * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-23 16:32:02
- */
-#include <stdint.h>
-
-#ifndef __GRIDMAP_ROS_H__
-#define __GRIDMAP_ROS_H__
+#ifndef ESDF_MAP_ROS_H_
+#define ESDF_MAP_ROS_H_
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -17,13 +9,14 @@
 #include <fstream>
 
 #include "common/common.h"
+#include "plan_environment/esdf_map.h"
 #include "plan_environment/grid_map.h"
+#include "plan_environment/plan_environment.h"
 using namespace motion_planning::plan_environment;
 using namespace motion_planning::common;
-class GridmapRos {
+class ESDFMapRos {
  public:
-  GridmapRos();
-  ~GridmapRos();
+  ESDFMapRos();
   bool init();
 
  private:
@@ -37,17 +30,17 @@ class GridmapRos {
  private:
   GridMap::Ptr global_gridmap_ptr_;
   GridMap::Ptr local_gridmap_ptr_;
-  
+  ESDFMap::Ptr local_esdf_map_ptr_;
+
   // ros
   ros::NodeHandle nh_;
   ros::NodeHandle pnh_;
   ros::Subscriber local_pcd_map_sub_;
   ros::Subscriber global_pcd_map_sub_;
-  ros::Publisher local_occupancy_grid_map_pub_;
+  ros::Publisher local_edsf_map_pub_;
   ros::Publisher global_occupancy_grid_map_pub_;
   ros::Subscriber click_pose_sub_;
-  bool save_global_map_ = false;
-  std::string map_path_;
+  nav_msgs::OccupancyGrid global_occupancy_grid_map_;
 };
 
-#endif /* __GRIDMAP_ROS_H__ */
+#endif  // ESDF_MAP_ROS_H_
