@@ -18,9 +18,19 @@ bool PolynomialTrajRos::init() {
 void PolynomialTrajRos::rvizVehiclePoseCallback(
     const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg) {
   click_points_.push_back(msg->pose.pose);
+  double x = msg->pose.pose.position.x;
+  double y = msg->pose.pose.position.y;
+  points_x_.push_back(x);
+  points_y_.push_back(y);
   int node_num = click_points_.size();
   if (node_num < 2) {
     return;
+  }
+  std::vector<Eigen::Vector2d> cubic_spine_points;
+  auto cubic_spline = Spline2D(points_x_, points_y_);
+  for (double i = 0; i < cubic_spline.s.back(); i += 0.1) {
+    auto point = cubic_spline.calc_postion(i);
+    cubic_spine_points.push_back(point);
   }
   Eigen::Vector2d start_pt, start_vel{0, 0}, start_acc{0, 0}, local_target_pt,
       local_target_vel{0, 0};
@@ -50,7 +60,7 @@ void PolynomialTrajRos::rvizVehiclePoseCallback(
       segment_point.push_back(point);
     }
     //    std::cout << "publish path " << std::endl;
-    polyTrajPathPublish(segment_point);
+    polyTrajPathPublish(segment_point, cubic_spine_points);
     return;
   }
 
@@ -75,12 +85,13 @@ void PolynomialTrajRos::rvizVehiclePoseCallback(
     segment_point.push_back(point);
   }
   std::cout << "publish path " << std::endl;
-  polyTrajPathPublish(segment_point);
+  polyTrajPathPublish(segment_point, cubic_spine_points);
   return;
 }
 
 void PolynomialTrajRos::polyTrajPathPublish(
-    const std::vector<Eigen::Vector2d>& path) {
+    const std::vector<Eigen::Vector2d>& path,
+    const std::vector<Eigen::Vector2d>& cubic_spline_points) {
   poly_traj_path_vis_->clear();
   std::string ns, frame_id("map");
   geometry_msgs::Point p;
@@ -105,5 +116,16 @@ void PolynomialTrajRos::polyTrajPathPublish(
     marker_linestrip.points.push_back(p);
   }
   poly_traj_path_vis_->append(marker_linestrip);
+
+  ns = "cubic_spline";
+  visualization_msgs::Marker marker_cubic_splinestrip =
+      RosVizTools::newLineStrip(0.02, ns, 0, ros_viz_tools::BLUE, frame_id);
+  for (auto point : cubic_spline_points) {
+    p.x = point[0];
+    p.y = point[1];
+    marker_cubic_splinestrip.points.push_back(p);
+  }
+  poly_traj_path_vis_->append(marker_cubic_splinestrip);
+
   poly_traj_path_vis_->publish();
 }
