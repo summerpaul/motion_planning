@@ -1,0 +1,7 @@
+<launch>
+<node pkg="motion_planning_ros" name="polynomial_traj_ros_node" type="polynomial_traj_ros_node" output="screen">
+    <param name="max_vel" value="1.5"/>
+    <param name="max_acc" value="2.0"/>
+</node>
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find motion_planning_ros)/rviz/polynomial_traj.rviz" />
+</launch>

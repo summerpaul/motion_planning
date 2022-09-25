@@ -1,0 +1,3 @@
+add_executable(polynomial_traj_ros_node polynomial_traj_ros.cpp polynomial_traj_ros_node.cpp)
+target_link_libraries(polynomial_traj_ros_node 
+${catkin_LIBRARIES})

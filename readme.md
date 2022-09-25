@@ -15,8 +15,15 @@ test astar with grid map
 ```
 roslaunch motion_planning_ros astar_search_grid_map_test.launch
 ```
+
 test esdf_map
 
 ```
 roslaunch motion_planning_ros esdfmap_test.launch
+```
+
+test polynomial_traj 
+
+```
+roslaunch motion_planning_ros polynomial_traj_test.launch
 ```
