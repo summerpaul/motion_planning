@@ -1,6 +1,6 @@
 #ifndef ESDF_MAP_ROS_H_
 #define ESDF_MAP_ROS_H_
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <ros/ros.h>
@@ -25,7 +25,7 @@ class ESDFMapRos {
   void globalPcdMapCallback(const sensor_msgs::PointCloud2::ConstPtr& pcd_map);
 
   void rvizPoseCallback(
-      const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
+      const geometry_msgs::PoseStamped::ConstPtr& msg);
 
  private:
   GridMap::Ptr global_gridmap_ptr_;

@@ -29,7 +29,7 @@ bool ESDFMapRos::init() {
       global_occupancy_grid_map_topic_name, 1);
 
   click_pose_sub_ =
-      nh_.subscribe("/initialpose", 50, &ESDFMapRos::rvizPoseCallback, this);
+      nh_.subscribe("/move_base_simple/goal", 50, &ESDFMapRos::rvizPoseCallback, this);
   local_esdf_map_ptr_ = std::make_shared<ESDFMap>();
   local_gridmap_ptr_ = std::make_shared<GridMap>();
   global_gridmap_ptr_ = std::make_shared<GridMap>();
@@ -94,4 +94,14 @@ void ESDFMapRos::globalPcdMapCallback(
 }
 
 void ESDFMapRos::rvizPoseCallback(
-    const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg) {}
+    const geometry_msgs::PoseStamped::ConstPtr& msg) {
+  VehicleState pose;
+  pose.position[0] = msg->pose.position.x;
+  pose.position[1] =msg->pose.position.y;
+  std::cout << "click pose is " << pose.position << std::endl;
+  double dist = local_esdf_map_ptr_->getDistance(pose.position);
+  std::cout << "dist is " << dist << std::endl;
+  Eigen::Vector2d grad;
+  local_esdf_map_ptr_->evaluateEDTWithGrad( pose.position,dist,grad  );
+  std::cout << "dist is " << dist << " grad is " << grad << std::endl;
+}

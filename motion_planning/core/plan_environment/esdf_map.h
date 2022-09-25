@@ -32,7 +32,7 @@ class ESDFMap {
           [&](int y, double val) {
             tmp_buffer_[grid_map_ptr_->getIndex(Eigen::Vector2i(x, y))] = val;
           },
-          0, grid_map_ptr_->getHeight()-1, 1);
+          0, grid_map_ptr_->getHeight() - 1, 1);
     }
     // std::cout << "fill y " << std::endl;
     for (int y = 0; y < grid_map_ptr_->getHeight(); y++) {
@@ -44,7 +44,7 @@ class ESDFMap {
             distance_buffer_[grid_map_ptr_->getIndex(Eigen::Vector2i(x, y))] =
                 grid_map_ptr_->getResolution() * std::sqrt(val);
           },
-          0, grid_map_ptr_->getWidth()-1, 0);
+          0, grid_map_ptr_->getWidth() - 1, 0);
     }
     // std::cout << "fill x " << std::endl;
   }
@@ -88,8 +88,8 @@ class ESDFMap {
   bool isInMap(const Eigen::Vector2i &idx) {
     return grid_map_ptr_->isVerify(idx);
   }
-  void evaluateEDTWithGrad(const Eigen::Vector2d &pos, double time,
-                           double &dist, Eigen::Vector2d &grad) {
+  void evaluateEDTWithGrad(const Eigen::Vector2d &pos, double &dist,
+                           Eigen::Vector2d &grad) {
     Eigen::Vector2d diff;
     Eigen::Vector2d sur_pts[2][2];
     getSurroundPts(pos, sur_pts, diff);
@@ -172,7 +172,8 @@ class ESDFMap {
   GridMap::Ptr grid_map_ptr_;
   std::vector<double> distance_buffer_;
   std::vector<double> tmp_buffer_;  //缓存y维度的距离
-  Eigen::Vector2i map_size_; 
+  Eigen::Vector2i map_size_;
+
  public:
   typedef std::shared_ptr<ESDFMap> Ptr;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
