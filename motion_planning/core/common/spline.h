@@ -1,5 +1,5 @@
-#ifndef MOTION_PLANNING_H_
-#define MOTION_PLANNING_H_
+#ifndef MOTION_PLANNING_SPLINE_H_
+#define MOTION_PLANNING_SPLINE_H_
 #include <Eigen/Eigen>
 #include <vector>
 namespace motion_planning {
@@ -176,4 +176,4 @@ class Spline2D {
 
 }  // namespace common
 }  // namespace motion_planning
-#endif  // MOTION_PLANNING_H_
+#endif  // MOTION_PLANNING_SPLINE_H_
