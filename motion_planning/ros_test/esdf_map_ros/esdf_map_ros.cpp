@@ -1,3 +1,9 @@
+/**
+ * @Author: Yunkai Xia
+ * @Date:   2022-09-26 08:52:50
+ * @Last Modified by:   Yunkai Xia
+ * @Last Modified time: 2022-09-26 15:05:36
+ */
 #include "esdf_map_ros.h"
 
 ESDFMapRos::ESDFMapRos() : pnh_("~") {}
@@ -73,7 +79,7 @@ void ESDFMapRos::localPcdMapCallback(
   local_esdf_map_ptr_->updateGridmap(local_gridmap_ptr_);
   local_esdf_map_ptr_->updateESDF2d();
   pcl::PointCloud<pcl::PointXYZI> cloud_i;
-  local_esdf_map_ptr_->getESDFPointCloud(cloud_i);
+  local_esdf_map_ptr_->getESDFPointCloud(cloud_i, "map");
   sensor_msgs::PointCloud2 cloud_msg;
   pcl::toROSMsg(cloud_i, cloud_msg);
   local_edsf_map_pub_.publish(cloud_msg);

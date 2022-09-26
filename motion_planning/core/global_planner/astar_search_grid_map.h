@@ -1,3 +1,9 @@
+/**
+ * @Author: Yunkai Xia
+ * @Date:   2022-09-26 08:52:50
+ * @Last Modified by:   Yunkai Xia
+ * @Last Modified time: 2022-09-26 09:53:49
+ */
 #ifndef MOTION_PLANNING_ASTAR_SEARCH_GRID_MAP_H_
 #define MOTION_PLANNING_ASTAR_SEARCH_GRID_MAP_H_
 #include "global_planner_interface.h"

@@ -1,3 +1,9 @@
+/**
+ * @Author: Yunkai Xia
+ * @Date:   2022-09-26 08:52:50
+ * @Last Modified by:   Yunkai Xia
+ * @Last Modified time: 2022-09-26 09:54:53
+ */
 #ifndef POLYNOMIAL_TRAJ_ROS_H_
 #define POLYNOMIAL_TRAJ_ROS_H_
 #include <geometry_msgs/PointStamped.h>

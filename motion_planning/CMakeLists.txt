@@ -8,11 +8,13 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
   ros_viz_tools
   interactive_markers
+  laser_geometry
+  tf
 )
 
 find_package(PCL REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 4 REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES motion_planning_ros

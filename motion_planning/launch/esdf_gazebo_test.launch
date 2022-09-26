@@ -1,0 +1,13 @@
+<launch>
+<node pkg="motion_planning_ros" name="esdf_gazebo_ros_node" type="esdf_gazebo_ros_node" output="screen">
+    <param name="map_config_path" value="$(find motion_planning_ros)/map/housemap.json"/>
+    <param name="local_esdf_map_topic_name" value="/local_esdf_map"/>
+    <param name="global_occupancy_grid_map_topic_name" value="/global_occupancy_grid_map"/>
+    <param name="local_occupancy_grid_map_topic_name" value="/local_occupancy_grid_map"/>
+    <param name="laser_scan_topic" value="/p3dx/laser/scan"/>
+    <param name="laser_frame_id" value="lms100"/>
+</node>
+
+<include file="$(find p3dx_gazebo)/launch/world.launch"/>
+<include file="$(find p3dx_gazebo)/launch/p3dx.launch"/>
+</launch>

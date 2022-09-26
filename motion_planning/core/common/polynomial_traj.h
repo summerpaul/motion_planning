@@ -1,3 +1,9 @@
+/**
+ * @Author: Yunkai Xia
+ * @Date:   2022-09-26 08:52:50
+ * @Last Modified by:   Yunkai Xia
+ * @Last Modified time: 2022-09-26 09:54:09
+ */
 #ifndef MOTION_PLANNING_POLYNOMIAL_TRAJ_H_
 #define MOTION_PLANNING_POLYNOMIAL_TRAJ_H_
 #include <Eigen/Eigen>
@@ -8,7 +14,7 @@ namespace motion_planning {
 namespace common {
 using std::vector;
 class PolynomialTraj {
- public:
+public:
   PolynomialTraj() {}
   ~PolynomialTraj() {}
   void init() {
@@ -29,12 +35,12 @@ class PolynomialTraj {
 
   vector<vector<double>> getCoef(int axis) {
     switch (axis) {
-      case 0:
-        return cxs;
-      case 1:
-        return cys;
-      default:
-        std::cout << "\033[31mIllegal axis!\033[0m" << std::endl;
+    case 0:
+      return cxs;
+    case 1:
+      return cys;
+    default:
+      std::cout << "\033[31mIllegal axis!\033[0m" << std::endl;
     }
 
     vector<vector<double>> empty;
@@ -79,7 +85,8 @@ class PolynomialTraj {
     }
     double ts = t;
     Eigen::VectorXd tv(order - 1);
-    for (int i = 0; i < order - 1; ++i) tv(i) = pow(ts, i);
+    for (int i = 0; i < order - 1; ++i)
+      tv(i) = pow(ts, i);
 
     Eigen::Vector2d vel;
     vel(0) = tv.dot(vx), vel(1) = tv.dot(vy);
@@ -104,7 +111,8 @@ class PolynomialTraj {
     }
     double ts = t;
     Eigen::VectorXd tv(order - 2);
-    for (int i = 0; i < order - 2; ++i) tv(i) = pow(ts, i);
+    for (int i = 0; i < order - 2; ++i)
+      tv(i) = pow(ts, i);
 
     Eigen::Vector2d acc;
     acc(0) = tv.dot(ax), acc(1) = tv.dot(ay);
@@ -196,12 +204,14 @@ class PolynomialTraj {
       double eval_t = 0.0;
       while (eval_t < ts) {
         Eigen::VectorXd tv(order - 1);
-        for (int i = 0; i < order - 1; ++i) tv(i) = pow(ts, i);
+        for (int i = 0; i < order - 1; ++i)
+          tv(i) = pow(ts, i);
         Eigen::Vector3d vel;
         vel(0) = tv.dot(vx), vel(1) = tv.dot(vy);
         double vn = vel.norm();
         mean_v += vn;
-        if (vn > max_v) max_v = vn;
+        if (vn > max_v)
+          max_v = vn;
         ++num;
 
         eval_t += 0.01;
@@ -228,12 +238,14 @@ class PolynomialTraj {
       double eval_t = 0.0;
       while (eval_t < ts) {
         Eigen::VectorXd tv(order - 2);
-        for (int i = 0; i < order - 2; ++i) tv(i) = pow(ts, i);
+        for (int i = 0; i < order - 2; ++i)
+          tv(i) = pow(ts, i);
         Eigen::Vector3d acc;
         acc(0) = tv.dot(ax), acc(1) = tv.dot(ay);
         double an = acc.norm();
         mean_a += an;
-        if (an > max_a) max_a = an;
+        if (an > max_a)
+          max_a = an;
         ++num;
 
         eval_t += 0.01;
@@ -243,22 +255,21 @@ class PolynomialTraj {
     mean_a = mean_a / double(num);
   }
 
-  static PolynomialTraj minSnapTraj(const Eigen::MatrixXd &Pos,
-                                    const Eigen::Vector2d &start_vel,
-                                    const Eigen::Vector2d &end_vel,
-                                    const Eigen::Vector2d &start_acc,
-                                    const Eigen::Vector2d &end_acc,
-                                    const Eigen::VectorXd &Time) {
+  static PolynomialTraj
+  minSnapTraj(const Eigen::MatrixXd &Pos, const Eigen::Vector2d &start_vel,
+              const Eigen::Vector2d &end_vel, const Eigen::Vector2d &start_acc,
+              const Eigen::Vector2d &end_acc, const Eigen::VectorXd &Time) {
     int seg_num = Time.size();
     Eigen::MatrixXd poly_coeff(seg_num, 2 * 6);
     Eigen::VectorXd Px(6 * seg_num), Py(6 * seg_num);
 
-    int num_f, num_p;  // number of fixed and free variables
-    int num_d;         // number of all segments' derivatives
+    int num_f, num_p; // number of fixed and free variables
+    int num_d;        // number of all segments' derivatives
 
     const static auto Factorial = [](int x) {
       int fac = 1;
-      for (int i = x; i > 0; i--) fac = fac * i;
+      for (int i = x; i > 0; i--)
+        fac = fac * i;
       return fac;
     };
 
@@ -305,23 +316,23 @@ class PolynomialTraj {
     /* ---------- Produce Selection Matrix C' ---------- */
     Eigen::MatrixXd Ct, C;
 
-    num_f = 2 * seg_num + 4;  // 3 + 3 + (seg_num - 1) * 2 = 2m + 4
-    num_p = 2 * seg_num - 2;  //(seg_num - 1) * 2 = 2m - 2
+    num_f = 2 * seg_num + 4; // 3 + 3 + (seg_num - 1) * 2 = 2m + 4
+    num_p = 2 * seg_num - 2; //(seg_num - 1) * 2 = 2m - 2
     num_d = 6 * seg_num;
     Ct = Eigen::MatrixXd::Zero(num_d, num_f + num_p);
     Ct(0, 0) = 1;
     Ct(2, 1) = 1;
-    Ct(4, 2) = 1;  // stack the start point
+    Ct(4, 2) = 1; // stack the start point
     Ct(1, 3) = 1;
     Ct(3, 2 * seg_num + 4) = 1;
     Ct(5, 2 * seg_num + 5) = 1;
 
     Ct(6 * (seg_num - 1) + 0, 2 * seg_num + 0) = 1;
-    Ct(6 * (seg_num - 1) + 1, 2 * seg_num + 1) = 1;  // Stack the end point
+    Ct(6 * (seg_num - 1) + 1, 2 * seg_num + 1) = 1; // Stack the end point
     Ct(6 * (seg_num - 1) + 2, 4 * seg_num + 0) = 1;
-    Ct(6 * (seg_num - 1) + 3, 2 * seg_num + 2) = 1;  // Stack the end point
+    Ct(6 * (seg_num - 1) + 3, 2 * seg_num + 2) = 1; // Stack the end point
     Ct(6 * (seg_num - 1) + 4, 4 * seg_num + 1) = 1;
-    Ct(6 * (seg_num - 1) + 5, 2 * seg_num + 3) = 1;  // Stack the end point
+    Ct(6 * (seg_num - 1) + 5, 2 * seg_num + 3) = 1; // Stack the end point
 
     for (int j = 2; j < seg_num; j++) {
       Ct(6 * (j - 1) + 0, 2 + 2 * (j - 1) + 0) = 1;
@@ -440,16 +451,16 @@ class PolynomialTraj {
     return poly_traj;
   }
 
- private:
-  vector<double> times;        //每段多项式的时间
-  vector<vector<double>> cxs;  // x轴多项式的系数
-  vector<vector<double>> cys;  // y轴多项式的系数
+private:
+  vector<double> times;       //每段多项式的时间
+  vector<vector<double>> cxs; // x轴多项式的系数
+  vector<vector<double>> cys; // y轴多项式的系数
   double time_sum;
   int num_seg;
   vector<Eigen::Vector2d> traj_vec2d;
   double length;
 };
 
-}  // namespace common
-}  // namespace motion_planning
-#endif  // MOTION_PLANNING_POLYNOMIAL_TRAJ_H_
+} // namespace common
+} // namespace motion_planning
+#endif // MOTION_PLANNING_POLYNOMIAL_TRAJ_H_

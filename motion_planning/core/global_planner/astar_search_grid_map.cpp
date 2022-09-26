@@ -1,3 +1,9 @@
+/**
+ * @Author: Yunkai Xia
+ * @Date:   2022-09-26 08:52:50
+ * @Last Modified by:   Yunkai Xia
+ * @Last Modified time: 2022-09-26 09:53:45
+ */
 #include "astar_search_grid_map.h"
 
 namespace motion_planning {
@@ -14,11 +20,11 @@ AStarSearchGridMap::AStarSearchGridMap() {
 }
 
 void AStarSearchGridMap::setPlanEnvrionment(
-    const PlanEnvrionment::Ptr& plan_env) {
+    const PlanEnvrionment::Ptr &plan_env) {
   grid_map_ptr_ = plan_env->getGridMap();
 }
-int AStarSearchGridMap::search(const VehicleState& start_pt,
-                               const VehicleState& end_pt) {
+int AStarSearchGridMap::search(const VehicleState &start_pt,
+                               const VehicleState &end_pt) {
   if (!grid_map_ptr_) {
     std::cout << "grid map is null, fail to plan!!" << std::endl;
     return NO_PATH;
@@ -31,7 +37,7 @@ int AStarSearchGridMap::search(const VehicleState& start_pt,
   cur_node->state = start_pt;
   cur_node->index = grid_map_ptr_->getGridMapIndex(start_pt.position);
   cur_node->g_score = 0.0;
-  cur_node->f_score = 5.0*getDiagHeu(start_pt.position, end_pt.position);
+  cur_node->f_score = 5.0 * getDiagHeu(start_pt.position, end_pt.position);
   std::cout << "f_score is " << cur_node->f_score << std::endl;
   cur_node->node_state = IN_OPEN_SET;
   open_set_.push(cur_node);
@@ -59,17 +65,20 @@ int AStarSearchGridMap::search(const VehicleState& start_pt,
       //拓展后节点的id
       auto neighbor_index = cur_node->index + motion;
       //   判断节点是否在地图中
-      if (!grid_map_ptr_->isVerify(neighbor_index)) continue;
-      if (grid_map_ptr_->isOccupied(neighbor_index)) continue;
+      if (!grid_map_ptr_->isVerify(neighbor_index))
+        continue;
+      if (grid_map_ptr_->isOccupied(neighbor_index))
+        continue;
       neighbor = expanded_nodes_.find(neighbor_index);
-      if (neighbor != nullptr && neighbor->node_state == IN_CLOSE_SET) continue;
+      if (neighbor != nullptr && neighbor->node_state == IN_CLOSE_SET)
+        continue;
       double x = motion[0] * resolution;
       double y = motion[1] * resolution;
       tmp_g_score = sqrt(x * x + y * y) + cur_node->g_score;
       tmp_f_score =
-          tmp_g_score +
-           5.0*getDiagHeu(grid_map_ptr_->getCartesianCoordinate(neighbor_index),
-                     end_pt.position);
+          tmp_g_score + 5.0 * getDiagHeu(grid_map_ptr_->getCartesianCoordinate(
+                                             neighbor_index),
+                                         end_pt.position);
       if (neighbor == nullptr) {
         neighbor = new Node();
         neighbor->state.position =
@@ -81,7 +90,8 @@ int AStarSearchGridMap::search(const VehicleState& start_pt,
         neighbor->node_state = IN_OPEN_SET;
         open_set_.push(neighbor);
         expanded_nodes_.insert(neighbor_index, neighbor);
-        // std::cout << "neighbor->state.position is " << neighbor->state.position << std::endl;
+        // std::cout << "neighbor->state.position is " <<
+        // neighbor->state.position << std::endl;
 
       } else if (neighbor->node_state == IN_OPEN_SET) {
         neighbor->parent = cur_node;
@@ -95,7 +105,7 @@ int AStarSearchGridMap::search(const VehicleState& start_pt,
   }
   return NO_PATH;
 }
-std::vector<VehicleState> AStarSearchGridMap::getPath(const double& delta_t) {
+std::vector<VehicleState> AStarSearchGridMap::getPath(const double &delta_t) {
   std::vector<VehicleState> path;
   for (int i = 0; i < path_nodes_.size(); ++i) {
     path.push_back(path_nodes_[i]->state);
@@ -120,5 +130,5 @@ void AStarSearchGridMap::retrievePath(NodePtr end_node) {
 
   reverse(path_nodes_.begin(), path_nodes_.end());
 }
-}  // namespace global_planner
-}  // namespace motion_planning
+} // namespace global_planner
+} // namespace motion_planning

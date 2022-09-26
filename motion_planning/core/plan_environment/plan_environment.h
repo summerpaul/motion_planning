@@ -1,3 +1,9 @@
+/**
+ * @Author: Yunkai Xia
+ * @Date:   2022-09-26 08:52:50
+ * @Last Modified by:   Yunkai Xia
+ * @Last Modified time: 2022-09-26 09:53:32
+ */
 #ifndef MOTION_PLANNING_PLAN_ENVRIONMENT_H_
 #define MOTION_PLANNING_PLAN_ENVRIONMENT_H_
 #include "esdf_map.h"
@@ -5,15 +11,15 @@
 namespace motion_planning {
 namespace plan_environment {
 class PlanEnvrionment {
- public:
-  void setGridMap(const GridMap::Ptr& grid_map) {
+public:
+  void setGridMap(const GridMap::Ptr &grid_map) {
     if (!grid_map_ptr_) {
       return;
     }
     grid_map_ptr_ = grid_map;
   }
   GridMap::Ptr getGridMap() const { return grid_map_ptr_; }
-  void setESDFMap(const GridMap::Ptr& grid_map) {
+  void setESDFMap(const GridMap::Ptr &grid_map) {
     if (!esdf_map_ptr_) {
       return;
     }
@@ -24,14 +30,14 @@ class PlanEnvrionment {
 
   ESDFMap::Ptr getESDFMap() const { return esdf_map_ptr_; }
 
- private:
+private:
   GridMap::Ptr grid_map_ptr_;
   ESDFMap::Ptr esdf_map_ptr_;
 
- public:
+public:
   typedef std::shared_ptr<PlanEnvrionment> Ptr;
 };
-}  // namespace plan_environment
-}  // namespace motion_planning
+} // namespace plan_environment
+} // namespace motion_planning
 
-#endif  // MOTION_PLANNING_PLAN_ENVRIONMENT_H_
+#endif // MOTION_PLANNING_PLAN_ENVRIONMENT_H_

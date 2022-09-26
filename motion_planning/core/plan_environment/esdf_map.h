@@ -1,10 +1,16 @@
+/**
+ * @Author: Yunkai Xia
+ * @Date:   2022-09-26 08:52:50
+ * @Last Modified by:   Yunkai Xia
+ * @Last Modified time: 2022-09-26 15:04:02
+ */
 #ifndef MOTION_PLANNING_ESDF_MAP_H_
 #define MOTION_PLANNING_ESDF_MAP_H_
 #include "grid_map.h"
 namespace motion_planning {
 namespace plan_environment {
 class ESDFMap {
- public:
+public:
   bool updateGridmap(const GridMap::Ptr &grid_map) {
     if (!grid_map) {
       std::cout << "gridmap_ is nullptr " << std::endl;
@@ -52,7 +58,7 @@ class ESDFMap {
     int index = grid_map_ptr_->getIndex(pos);
     return distance_buffer_[index];
   }
-  void getESDFPointCloud(pcl::PointCloud<pcl::PointXYZI> &cloud) {
+  void getESDFPointCloud(pcl::PointCloud<pcl::PointXYZI> &cloud, const std::string & frame_id) {
     cloud.clear();
     double dist;
     pcl::PointXYZI pt;
@@ -78,7 +84,7 @@ class ESDFMap {
     cloud.width = cloud.points.size();
     cloud.height = 1;
     cloud.is_dense = true;
-    cloud.header.frame_id = "map";
+    cloud.header.frame_id = frame_id;
   }
   bool isInMap(const Eigen::Vector2d &pos) {
     Eigen::Vector2i eigein_index = grid_map_ptr_->getGridMapIndex(pos);
@@ -137,7 +143,7 @@ class ESDFMap {
     }
   }
 
- private:
+private:
   template <typename F_get_val, typename F_set_val>
   void fillESDF(F_get_val f_get_val, F_set_val f_set_val, int start, int end,
                 int dim) {
@@ -162,22 +168,23 @@ class ESDFMap {
     }
     k = start;
     for (int q = start; q <= end; q++) {
-      while (z[k + 1] < q) k++;
+      while (z[k + 1] < q)
+        k++;
       double val = (q - v[k]) * (q - v[k]) + f_get_val(v[k]);
       f_set_val(q, val);
     }
   }
 
- private:
+private:
   GridMap::Ptr grid_map_ptr_;
   std::vector<double> distance_buffer_;
-  std::vector<double> tmp_buffer_;  //缓存y维度的距离
+  std::vector<double> tmp_buffer_; //缓存y维度的距离
   Eigen::Vector2i map_size_;
 
- public:
+public:
   typedef std::shared_ptr<ESDFMap> Ptr;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
-}  // namespace plan_environment
-}  // namespace motion_planning
-#endif  // MOTION_PLANNING_ESDF_MAP_H_
+} // namespace plan_environment
+} // namespace motion_planning
+#endif // MOTION_PLANNING_ESDF_MAP_H_

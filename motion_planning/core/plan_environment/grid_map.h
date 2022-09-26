@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-23 14:42:37
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-23 18:32:46
+ * @Last Modified time: 2022-09-26 13:57:12
  */
 #include <stdint.h>
 
@@ -20,23 +20,22 @@ namespace motion_planning {
 namespace plan_environment {
 
 /***************** Mat转vector **********************/
-template <typename _Tp>
-std::vector<_Tp> convertMat2Vector(const cv::Mat &mat) {
-  return (std::vector<_Tp>)(mat.reshape(1, 1));  //通道数不变，按行转为一行
+template <typename _Tp> std::vector<_Tp> convertMat2Vector(const cv::Mat &mat) {
+  return (std::vector<_Tp>)(mat.reshape(1, 1)); //通道数不变，按行转为一行
 }
 
 /****************** vector转Mat *********************/
 template <typename _Tp>
 cv::Mat convertVector2Mat(std::vector<_Tp> v, int channels, int rows) {
-  cv::Mat mat = cv::Mat(v);  //将vector变成单列的mat
+  cv::Mat mat = cv::Mat(v); //将vector变成单列的mat
   cv::Mat dest =
-      mat.reshape(channels, rows).clone();  // PS：必须clone()一份，否则返回出错
+      mat.reshape(channels, rows).clone(); // PS：必须clone()一份，否则返回出错
   return dest;
 }
 
 class GridMap {
- public:
-  // cv map转gridmap
+public:
+  // cv map转gridmap，加载的是原始的图片类型，需要对颜色进行反转
   void createGridMap(const cv::Mat &mat, const double &root_x,
                      const double &root_y, const double &root_theta,
                      const double &resolution = 0.05,
@@ -47,14 +46,35 @@ class GridMap {
     root_x_ = root_x;
     root_y_ = root_y;
     root_theta_ = root_theta;
+    // 将颜色进行反转
+    cv::Mat mat_color_inversion = mat.clone();
+    for (int i = 0; i < mat.rows; i++) {
+      for (int j = 0; j < mat.cols; j++) {
+        mat_color_inversion.at<uchar>(i, j) =
+            255 - mat.at<uchar>(i, j); //灰度反转
+      }
+    }
+
     cv::Mat mat_fliped, dilated_image;
     int inf_step = ceil(robot_radius / resolution_);
+
+    // 使用圆进行膨胀
     cv::Mat element = cv::getStructuringElement(
         cv::MORPH_ELLIPSE, cv::Size(2 * inf_step + 1, 2 * inf_step + 1),
         cv::Point(inf_step, inf_step));
-    cv::dilate(mat, dilated_image, element);
+
+    cv::dilate(mat_color_inversion, dilated_image, element);
+    // 将图片进行反转
     cv::flip(dilated_image, mat_fliped, 0);
     data_ = convertMat2Vector<uchar>(mat_fliped);
+  }
+
+  void loadImage(const cv::Mat &mat) {
+    cv::Mat mat_fliped;
+    // 图片进行旋转
+    // 图片反转
+    cv::flip(mat, mat_fliped, 0);
+    this->data_ = convertMat2Vector<uchar>(mat_fliped);
   }
   //   点云转栅格地图
   void createGridMap(const pcl::PointCloud<pcl::PointXYZ> &cloud,
@@ -90,13 +110,17 @@ class GridMap {
 
     for (auto point : cloud.points) {
       int i = (point.x - root_x_) / resolution_;
-      if (i < 0 || i > width_ - 1) continue;
+      if (i < 0 || i > width_ - 1)
+        continue;
       int j = (point.y - root_y_) / resolution_;
-      if (j < 0 || j > height_ - 1) continue;
+      if (j < 0 || j > height_ - 1)
+        continue;
       for (int x = -inf_step; x <= inf_step; ++x)
         for (int y = -inf_step; y <= inf_step; ++y) {
-          if (i + x < 0 || i + x > width_ - 1) continue;
-          if (j + y < 0 || j + y > height_ - 1) continue;
+          if (i + x < 0 || i + x > width_ - 1)
+            continue;
+          if (j + y < 0 || j + y > height_ - 1)
+            continue;
           data_[i + x + (j + y) * width_] = 255;
         }
     }
@@ -147,7 +171,7 @@ class GridMap {
   void set(size_t index, uchar value) { data_[index] = value; }
 
   bool isOccupied(int index) const {
-    if (data_[index] == 255) {
+    if (data_[index] > 200) {
       return true;
     }
     return false;
@@ -184,7 +208,7 @@ class GridMap {
     return Eigen::Vector2d(x, y);
   }
 
- private:
+private:
   int width_;
   int height_;
   double resolution_;
@@ -196,11 +220,11 @@ class GridMap {
   Eigen::Vector2i map_size_2i_;
   Eigen::Vector2d origin_;
 
- public:
+public:
   typedef std::shared_ptr<GridMap> Ptr;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-}  // namespace plan_environment
-}  // namespace motion_planning
+} // namespace plan_environment
+} // namespace motion_planning
 #endif /* __GRID_MAP_H__ */
