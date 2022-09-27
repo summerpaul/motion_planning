@@ -1,3 +1,15 @@
+/**
+ * @Author: Yunkai Xia
+ * @Date:   2022-09-26 08:52:50
+ * @Last Modified by:   Yunkai Xia
+ * @Last Modified time: 2022-09-27 14:56:57
+ */
+/**
+ * @Author: Yunkai Xia
+ * @Date:   2022-09-26 08:52:50
+ * @Last Modified by:   Yunkai Xia
+ * @Last Modified time: 2022-09-27 14:28:07
+ */
 #include "astar_search_grid_map_ros.h"
 
 AStarSearchGridMapRos::AStarSearchGridMapRos() : pnh_("~") {}
@@ -49,6 +61,7 @@ void AStarSearchGridMapRos::globalPcdMapCallback(
     global_gridmap_ptr_->createGridMap(cloud);
     is_create_grid_map = true;
     std::cout << "createGridMap" << std::endl;
+
   }
 
   auto msg = gridmaptoRosMessage(*global_gridmap_ptr_);
@@ -57,6 +70,7 @@ void AStarSearchGridMapRos::globalPcdMapCallback(
   if (!receive_glocal_map_flag_) {
     receive_glocal_map_flag_ = true;
     plan_env_ptr_->setGridMap(global_gridmap_ptr_);
+    std::cout << "setGridMap " << "!global_gridmap_ptr_ is " << !global_gridmap_ptr_ << std::endl;
 
     global_planner_ptr_->setPlanEnvrionment(plan_env_ptr_);
     std::cout << "map width is " << global_gridmap_ptr_->getWidth()
@@ -113,11 +127,14 @@ void AStarSearchGridMapRos::rvizGoalPoseCallback(
     return;
   }
   global_planner_ptr_->reset();
+  auto start_time = ros::Time::now().toSec();
   auto flag = global_planner_ptr_->search(start_pt_, goal_pt_);
   if (flag == NO_PATH) {
     std::cout << "no path " << std::endl;
     return;
   }
+  auto end_time = ros::Time::now().toSec();
+  std::cout << "dt is " << end_time - start_time << std::endl;
   std::cout << "get global path " << std::endl;
   auto global_search_path = global_planner_ptr_->getPath();
   std::cout << "global_search_path size is " << global_search_path.size() << std::endl;

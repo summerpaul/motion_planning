@@ -2,9 +2,9 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-23 14:32:39
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-23 14:40:22
+ * @Last Modified time: 2022-09-27 14:54:14
  */
-#include <stdint.h>
+
 
 #ifndef MOTION_PLANNING_TIME_H_
 #define MOTION_PLANNING_TIME_H_
@@ -47,6 +47,15 @@ int64_t toUniversal(Time time) { return time.time_since_epoch().count(); }
 std::ostream &operator<<(std::ostream &os, Time time) {
   os << std::to_string(toUniversal(time));
   return os;
+}
+
+double getThreadCpuTimeSeconds() {
+#ifndef WIN32
+  struct timespec thread_cpu_time;
+  return thread_cpu_time.tv_sec + 1e-9 * thread_cpu_time.tv_nsec;
+#else
+  return 0.;
+#endif
 }
 } // namespace common
 } // namespace motion_planning

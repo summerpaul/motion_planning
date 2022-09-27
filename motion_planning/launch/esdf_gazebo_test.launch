@@ -6,8 +6,10 @@
     <param name="local_occupancy_grid_map_topic_name" value="/local_occupancy_grid_map"/>
     <param name="laser_scan_topic" value="/p3dx/laser/scan"/>
     <param name="laser_frame_id" value="lms100"/>
+    <param name="robot_radius" value="0.1"/>
+
 </node>
 
-<include file="$(find p3dx_gazebo)/launch/world.launch"/>
-<include file="$(find p3dx_gazebo)/launch/p3dx.launch"/>
+<!-- <include file="$(find p3dx_gazebo)/launch/world.launch"/> -->
+<!-- <include file="$(find p3dx_gazebo)/launch/p3dx.launch"/> -->
 </launch>

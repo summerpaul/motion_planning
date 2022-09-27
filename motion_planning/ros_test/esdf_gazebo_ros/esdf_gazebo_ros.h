@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 09:01:10
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-26 14:58:24
+ * @Last Modified time: 2022-09-27 13:20:23
  */
 #include <stdint.h>
 
@@ -53,6 +53,7 @@ private:
   laser_geometry::LaserProjection projector_;
   std::string laser_scan_topic_;
   std::string laser_frame_id_;
+  double robot_radius_;
 };
 
 #endif /* __ESDF_GAZEBO_ROS_H__ */

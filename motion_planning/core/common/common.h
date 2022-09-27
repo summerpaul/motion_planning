@@ -2,11 +2,12 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-26 09:53:59
+ * @Last Modified time: 2022-09-27 15:19:02
  */
 #ifndef MOTION_PLANNING_COMMON_H_
 #define MOTION_PLANNING_COMMON_H_
 #include <Eigen/Core>
+#include <memory>
 #include <unordered_map>
 #define IN_CLOSE_SET 'a'
 #define IN_OPEN_SET 'b'
@@ -39,7 +40,7 @@ struct Node {
   double duration;
   double g_score;
   double f_score;
-  Node *parent;
+  std::shared_ptr<Node> parent;
   char node_state;
   double time;
   int time_idx;
@@ -49,7 +50,7 @@ struct Node {
   }
   ~Node() {}
 };
-typedef Node *NodePtr;
+typedef std::shared_ptr<Node> NodePtr;
 
 template <typename T> struct matrix_hash : std::unary_function<T, size_t> {
   std::size_t operator()(T const &matrix) const {

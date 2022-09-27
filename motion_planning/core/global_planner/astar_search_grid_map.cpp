@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-26 09:53:45
+ * @Last Modified time: 2022-09-27 15:19:40
  */
 #include "astar_search_grid_map.h"
 
@@ -22,6 +22,10 @@ AStarSearchGridMap::AStarSearchGridMap() {
 void AStarSearchGridMap::setPlanEnvrionment(
     const PlanEnvrionment::Ptr &plan_env) {
   grid_map_ptr_ = plan_env->getGridMap();
+  std::cout << "setGridMap " << "!global_gridmap_ptr_ is " << !plan_env->getGridMap() << std::endl;
+  if (grid_map_ptr_) {
+    std::cout << "setPlanEnvrionment in AStarSearchGridMap " << std::endl;
+  }
 }
 int AStarSearchGridMap::search(const VehicleState &start_pt,
                                const VehicleState &end_pt) {
@@ -32,7 +36,7 @@ int AStarSearchGridMap::search(const VehicleState &start_pt,
   double resolution = grid_map_ptr_->getResolution();
   std::cout << "start astar search with grid map" << std::endl;
   end_pt_ = end_pt;
-  NodePtr cur_node = new Node();
+  NodePtr cur_node = std::make_shared<Node>();
   cur_node->parent = NULL;
   cur_node->state = start_pt;
   cur_node->index = grid_map_ptr_->getGridMapIndex(start_pt.position);
@@ -80,7 +84,7 @@ int AStarSearchGridMap::search(const VehicleState &start_pt,
                                              neighbor_index),
                                          end_pt.position);
       if (neighbor == nullptr) {
-        neighbor = new Node();
+        neighbor = std::make_shared<Node>();
         neighbor->state.position =
             grid_map_ptr_->getCartesianCoordinate(neighbor_index);
         neighbor->index = neighbor_index;

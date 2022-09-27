@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-23 14:42:37
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-26 13:57:12
+ * @Last Modified time: 2022-09-27 14:12:46
  */
 #include <stdint.h>
 
@@ -46,14 +46,18 @@ public:
     root_x_ = root_x;
     root_y_ = root_y;
     root_theta_ = root_theta;
-    // 将颜色进行反转
+    std::cout << "src mat " << mat << std::endl;
     cv::Mat mat_color_inversion = mat.clone();
     for (int i = 0; i < mat.rows; i++) {
       for (int j = 0; j < mat.cols; j++) {
         mat_color_inversion.at<uchar>(i, j) =
-            255 - mat.at<uchar>(i, j); //灰度反转
+            100 - mat.at<uchar>(i, j) * 100 / 255;
+        mat.at<uchar>(i, j);
       }
     }
+    // cv::bitwise_not(mat, mat_color_inversion);
+    cv::imshow("mat_color_inversion", mat_color_inversion);
+    cv::waitKey(0);
 
     cv::Mat mat_fliped, dilated_image;
     int inf_step = ceil(robot_radius / resolution_);
@@ -69,6 +73,11 @@ public:
     data_ = convertMat2Vector<uchar>(mat_fliped);
   }
 
+  void computeDistanceField(const cv::Mat &_map, cv::Mat &_distField) {
+    // 使用欧式距离场
+    // cv::bitwise_not(srcMap, srcMap);
+    cv::distanceTransform(_map, _distField, cv::DIST_L2, 3);
+  }
   void loadImage(const cv::Mat &mat) {
     cv::Mat mat_fliped;
     // 图片进行旋转
@@ -223,7 +232,7 @@ private:
 public:
   typedef std::shared_ptr<GridMap> Ptr;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-};
+}; // namespace plan_environment
 
 } // namespace plan_environment
 } // namespace motion_planning
