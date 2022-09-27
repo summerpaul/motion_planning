@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-26 15:04:02
+ * @Last Modified time: 2022-09-26 16:38:55
  */
 #ifndef MOTION_PLANNING_ESDF_MAP_H_
 #define MOTION_PLANNING_ESDF_MAP_H_
@@ -73,7 +73,7 @@ public:
         dist = std::max(dist, min_dist);
         pt.x = pos(0);
         pt.y = pos(1);
-        pt.z = 0.0;
+        pt.z =-0.1;
         pt.intensity = (dist - min_dist) / (max_dist - min_dist);
         cloud.push_back(pt);
         if (dist < 0) {

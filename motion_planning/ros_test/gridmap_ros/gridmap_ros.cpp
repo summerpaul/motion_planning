@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-08-24 10:07:35
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-23 16:39:27
+ * @Last Modified time: 2022-09-27 08:55:18
  */
 
 #include "gridmap_ros.h"
@@ -84,7 +84,13 @@ void GridmapRos::globalPcdMapCallback(
     ofs << "occupied_thresh: 0.5" << std::endl;
     ofs << "free_thresh: 0.2" << std::endl;
     ofs << "negate: 0" << std::endl;
+    auto mat = global_gridmap_ptr_->toImage();
+    cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE ); // Create a window for display.
+    cv::imshow( "Display window", mat );                // Show our image inside it.
+    cv::waitKey(0);
+    
   }
+
 }
 nav_msgs::OccupancyGrid GridmapRos::gridmaptoRosMessage(
     const GridMap& gridmap) {
