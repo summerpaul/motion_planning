@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-27 14:57:07
+ * @Last Modified time: 2022-09-27 18:47:22
  */
 #ifndef ASTAR_SEARCH_GRID_MAP_ROS_H_
 #define ASTAR_SEARCH_GRID_MAP_ROS_H_
@@ -21,7 +21,7 @@
 #include "plan_environment/grid_map.h"
 #include "plan_environment/plan_environment.h"
 #include "ros_viz_tools/ros_viz_tools.h"
-// #include "common/time.h"
+#include "common/time.h"
 using ros_viz_tools::ColorMap;
 using ros_viz_tools::RosVizTools;
 using namespace motion_planning::plan_environment;

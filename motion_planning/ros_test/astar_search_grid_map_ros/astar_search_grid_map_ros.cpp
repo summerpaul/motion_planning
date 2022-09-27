@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-27 14:56:57
+ * @Last Modified time: 2022-09-27 18:48:15
  */
 /**
  * @Author: Yunkai Xia
@@ -127,13 +127,13 @@ void AStarSearchGridMapRos::rvizGoalPoseCallback(
     return;
   }
   global_planner_ptr_->reset();
-  auto start_time = ros::Time::now().toSec();
+  auto start_time = motion_planning::common::getTimeNow();
   auto flag = global_planner_ptr_->search(start_pt_, goal_pt_);
   if (flag == NO_PATH) {
     std::cout << "no path " << std::endl;
     return;
   }
-  auto end_time = ros::Time::now().toSec();
+  auto end_time = motion_planning::common::getTimeNow();
   std::cout << "dt is " << end_time - start_time << std::endl;
   std::cout << "get global path " << std::endl;
   auto global_search_path = global_planner_ptr_->getPath();

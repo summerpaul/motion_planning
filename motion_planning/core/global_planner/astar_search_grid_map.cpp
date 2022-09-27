@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-27 15:19:40
+ * @Last Modified time: 2022-09-27 18:56:01
  */
 #include "astar_search_grid_map.h"
 
@@ -22,7 +22,9 @@ AStarSearchGridMap::AStarSearchGridMap() {
 void AStarSearchGridMap::setPlanEnvrionment(
     const PlanEnvrionment::Ptr &plan_env) {
   grid_map_ptr_ = plan_env->getGridMap();
-  std::cout << "setGridMap " << "!global_gridmap_ptr_ is " << !plan_env->getGridMap() << std::endl;
+  std::cout << "setGridMap "
+            << "!global_gridmap_ptr_ is " << !plan_env->getGridMap()
+            << std::endl;
   if (grid_map_ptr_) {
     std::cout << "setPlanEnvrionment in AStarSearchGridMap " << std::endl;
   }
@@ -33,19 +35,32 @@ int AStarSearchGridMap::search(const VehicleState &start_pt,
     std::cout << "grid map is null, fail to plan!!" << std::endl;
     return NO_PATH;
   }
+  Eigen::Vector2i end_index = grid_map_ptr_->getGridMapIndex(end_pt.position);
+  Eigen::Vector2i start_index =
+      grid_map_ptr_->getGridMapIndex(start_pt.position);
+
+  if (grid_map_ptr_->isOccupied(end_index) ||
+      !grid_map_ptr_->isVerify(end_index)) {
+    std::cout << "invalid goal point , fail to plan!!" << std::endl;
+    return NO_PATH;
+  }
+  if (grid_map_ptr_->isOccupied(start_index) ||
+      !grid_map_ptr_->isVerify(start_index)) {
+    std::cout << "invalid start point , fail to plan!!" << std::endl;
+    return NO_PATH;
+  }
   double resolution = grid_map_ptr_->getResolution();
   std::cout << "start astar search with grid map" << std::endl;
   end_pt_ = end_pt;
   NodePtr cur_node = std::make_shared<Node>();
   cur_node->parent = NULL;
   cur_node->state = start_pt;
-  cur_node->index = grid_map_ptr_->getGridMapIndex(start_pt.position);
+  cur_node->index = start_index;
   cur_node->g_score = 0.0;
   cur_node->f_score = 5.0 * getDiagHeu(start_pt.position, end_pt.position);
   std::cout << "f_score is " << cur_node->f_score << std::endl;
   cur_node->node_state = IN_OPEN_SET;
   open_set_.push(cur_node);
-  Eigen::Vector2i end_index = grid_map_ptr_->getGridMapIndex(end_pt.position);
   expanded_nodes_.insert(cur_node->index, cur_node);
   NodePtr neighbor = NULL;
   NodePtr terminate_node = NULL;
