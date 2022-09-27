@@ -16,6 +16,10 @@
 
 namespace motion_planning {
 namespace common {
+
+
+
+ 
 struct VehicleState {
   Eigen::Vector2d position; // x y
   Eigen::Vector2d speed;    // vx vy
