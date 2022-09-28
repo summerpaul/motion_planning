@@ -33,3 +33,16 @@ reference
 ```
 https://github.com/tuw-robotics/tuw_multi_robot
 ```
+
+```
+https://github.com/amslabtech/dwa_planner
+```
+
+
+生成complie_commands.json
+
+`catkin_make -DCMAKE_EXPORT_COMPILE_COMMANDS=1 `
+
+添加complie_commands.json
+
+`"compileCommands": "${workspaceFolder}/build/compile_commands.json"`

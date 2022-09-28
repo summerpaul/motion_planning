@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-27 10:53:16
+ * @Last Modified time: 2022-09-28 16:07:12
  */
 #ifndef MOTION_PLANNING_ESDF_MAP_H_
 #define MOTION_PLANNING_ESDF_MAP_H_
@@ -58,8 +58,10 @@ public:
     int index = grid_map_ptr_->getIndex(pos);
     return distance_buffer_[index];
   }
-  
-  void getESDFPointCloud(pcl::PointCloud<pcl::PointXYZI> &cloud, const std::string & frame_id) {
+  double getResolution() const { return grid_map_ptr_->getResolution(); }
+
+  void getESDFPointCloud(pcl::PointCloud<pcl::PointXYZI> &cloud,
+                         const std::string &frame_id) {
     cloud.clear();
     double dist;
     pcl::PointXYZI pt;
@@ -74,7 +76,7 @@ public:
         dist = std::max(dist, min_dist);
         pt.x = pos(0);
         pt.y = pos(1);
-        pt.z =-0.1;
+        pt.z = -0.1;
         pt.intensity = (dist - min_dist) / (max_dist - min_dist);
         cloud.push_back(pt);
         if (dist < 0) {
@@ -175,7 +177,6 @@ private:
       f_set_val(q, val);
     }
   }
-  
 
 private:
   GridMap::Ptr grid_map_ptr_;
