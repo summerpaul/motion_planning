@@ -22,8 +22,14 @@ test esdf_map
 roslaunch motion_planning_ros esdfmap_test.launch
 ```
 
-test polynomial_traj 
+test polynomial_traj
 
 ```
 roslaunch motion_planning_ros polynomial_traj_test.launch
+```
+
+reference
+
+```
+https://github.com/tuw-robotics/tuw_multi_robot
 ```
