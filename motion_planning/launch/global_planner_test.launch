@@ -1,5 +1,7 @@
 <launch>
-<node pkg="motion_planning_ros" name="astar_search_grid_map_ros_node" type="astar_search_grid_map_ros_node" output="screen">
+<node pkg="motion_planning_ros" name="global_planner_ros_node" type="global_planner_ros_node" output="screen">
+<!-- type 1.kinodynamic_astar_grid_map 2.astar_search_grid_map  -->
+    <param name="planner_type" value="kinodynamic_astar_grid_map"/>
     <param name="global_pcd_map_topic_name" value="/map_generator/global_cloud"/>
     <param name="local_occupancy_grid_map_topic_name" value="/local_occupancy_grid_map"/>
     <param name="global_occupancy_grid_map_topic_name" value="/global_occupancy_grid_map"/>

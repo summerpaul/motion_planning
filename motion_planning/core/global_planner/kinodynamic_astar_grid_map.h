@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-27 09:57:36
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-27 17:08:23
+ * @Last Modified time: 2022-09-28 13:48:11
  */
 #include <stdint.h>
 
@@ -28,10 +28,10 @@ public:
   setPlanEnvrionment(const PlanEnvrionment::Ptr &plan_env) override;
 
 private:
-  void estimateHeuristic(const VehicleState &currt_pt,
-                         const VehicleState &target_pt, double &optical_time);
-  vector<double> quartic(double a, double b, double c, double d, double e);
-  vector<double> cubic(double a, double b, double c, double d);
+  double estimateHeuristic(const VehicleState &currt_pt,
+                           const VehicleState &target_pt, double &optimal_time);
+  std::vector<double> quartic(double a, double b, double c, double d, double e);
+  std::vector<double> cubic(double a, double b, double c, double d);
 
 private:
   GridMap::Ptr grid_map_ptr_;

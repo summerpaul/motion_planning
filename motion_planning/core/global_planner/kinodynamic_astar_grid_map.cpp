@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-27 15:04:04
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-27 17:15:23
+ * @Last Modified time: 2022-09-28 15:29:13
  */
 #include <iostream>
 
@@ -16,6 +16,21 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
     std::cout << "grid map is null, fail to plan!!" << std::endl;
     return NO_PATH;
   }
+  Eigen::Vector2i end_index = grid_map_ptr_->getGridMapIndex(end_pt.position);
+  Eigen::Vector2i start_index =
+      grid_map_ptr_->getGridMapIndex(start_pt.position);
+
+  if (grid_map_ptr_->isOccupied(end_index) ||
+      !grid_map_ptr_->isVerify(end_index)) {
+    std::cout << "invalid goal point , fail to plan!!" << std::endl;
+    return NO_PATH;
+  }
+  if (grid_map_ptr_->isOccupied(start_index) ||
+      !grid_map_ptr_->isVerify(start_index)) {
+    std::cout << "invalid start point , fail to plan!!" << std::endl;
+    return NO_PATH;
+  }
+  double lambda_heu = 5.0;
   start_val_ = start_pt.speed;
   start_acc_ = start_pt.acc;
   double resolution = grid_map_ptr_->getResolution();
@@ -25,10 +40,37 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
   cur_node->state = start_pt;
   cur_node->index = grid_map_ptr_->getGridMapIndex(start_pt.position);
   cur_node->g_score = 0.0;
+  double time_to_goal;
+  double cost_to_goal = estimateHeuristic(start_pt, end_pt, time_to_goal);
+  std::cout << "time_to_goal is " << time_to_goal << std::endl;
+  std::cout << "cost to goal is " << cost_to_goal << std::endl;
+  cur_node->node_state = IN_OPEN_SET;
+  cur_node->f_score = lambda_heu * cost_to_goal;
+  open_set_.push(cur_node);
+  expanded_nodes_.insert(cur_node->index, cur_node);
+  NodePtr neighbor = NULL;
+  NodePtr terminate_node = NULL;
+  const int tolerance = ceil(1 / resolution);
+  while (!open_set_.empty()) {
+    cur_node = open_set_.top();
+    bool near_end = abs(cur_node->index(0) - end_index(0)) <= tolerance &&
+                    abs(cur_node->index(1) - end_index(1)) <= tolerance;
+    if (near_end) {
+      terminate_node = cur_node;
+      // retrievePath(terminate_node);
+      // estimateHeuristic(cur_node->state, end_state, time_to_goal);
+      return REACH_END;
+    }
+    open_set_.pop();
+    cur_node->node_state = IN_CLOSE_SET;
+  }
+
   return NO_PATH;
 }
 std::vector<VehicleState>
-KinodynamicAstarGridMap::getPath(const double &delta_t = 0.1) {}
+KinodynamicAstarGridMap::getPath(const double &delta_t) {
+  return std::vector<VehicleState>();
+}
 void KinodynamicAstarGridMap::reset() {}
 
 void KinodynamicAstarGridMap::setPlanEnvrionment(
@@ -38,33 +80,34 @@ void KinodynamicAstarGridMap::setPlanEnvrionment(
 
 // obvp问题：Optical Boundary Value Problem ，mininum jerk
 // 主要原理是利用庞特里亚金原理解决两点边值问题，得到最优解后用最优解的控制代价作为启发函数。
-void KinodynamicAstarGridMap::estimateHeuristic(const VehicleState &currt_pt,
-                                                const VehicleState &target_pt,
-                                                double &optical_time) {
+double KinodynamicAstarGridMap::estimateHeuristic(const VehicleState &currt_pt,
+                                                  const VehicleState &target_pt,
+                                                  double &optimal_time) {
   // 使用五次多项式
 
   // 起点终点的位置向量
+  const double w_time = 10;
   const Eigen::Vector2d dp = target_pt.position - currt_pt.position;
   // 当前速度
-  const Vector2d v0 = currt_pt.speed;
-  const Vector2d v1 = target_pt.speed;
+  const Eigen::Vector2d v0 = currt_pt.speed;
+  const Eigen::Vector2d v1 = target_pt.speed;
   //   对启发函数进行时间求导，得到关于时间的四次多项式，
   double c1 = -36 * dp.dot(dp);
   double c2 = 24 * (v0 + v1).dot(dp);
   double c3 = -4 * (v0.dot(v0) + v0.dot(v1) + v1.dot(v1));
   double c4 = 0;
-  double c5 = 10; //时间花费的权重
+  double c5 = w_time; //时间花费的权重
   // 关于时间的一元四次方程是通过费拉里方法求解的，需要嵌套一个元三次方程进行求解，也就是代码中应的cubic（）函数
   std::vector<double> ts = quartic(c5, c4, c3, c2, c1);
   double v_max = 1.5 * 0.5; // 1.5表示最大速度
-  double t_bar = (v0 - v1).lpNorm<Infinity>() / v_max;
+  double t_bar = (v0 - v1).lpNorm<Eigen::Infinity>() / v_max;
   ts.push_back(t_bar);
   double cost = 100000000;
   double t_d = t_bar;
-  or (auto t : ts) {
+  for (auto t : ts) {
     if (t < t_bar)
       continue;
-    double c = -c1 / (3 * t * t * t) - c2 / (2 * t * t) - c3 / t + w_time_ * t;
+    double c = -c1 / (3 * t * t * t) - c2 / (2 * t * t) - c3 / t + w_time * t;
     if (c < cost) {
       cost = c;
       t_d = t;
@@ -74,16 +117,17 @@ void KinodynamicAstarGridMap::estimateHeuristic(const VehicleState &currt_pt,
   return 1.0 * (1 + 0.001) * cost;
 }
 
-vector<double> KinodynamicAstarGridMap::quartic(double a, double b, double c,
-                                                double d, double e) {
-  vector<double> dts;
+std::vector<double> KinodynamicAstarGridMap::quartic(double a, double b,
+                                                     double c, double d,
+                                                     double e) {
+  std::vector<double> dts;
 
   double a3 = b / a;
   double a2 = c / a;
   double a1 = d / a;
   double a0 = e / a;
 
-  vector<double> ys =
+  std::vector<double> ys =
       cubic(1, -a2, a1 * a3 - 4 * a0, 4 * a2 * a0 - a1 * a1 - a3 * a3 * a0);
   double y1 = ys.front();
   double r = a3 * a3 / 4 - a2 + y1;
@@ -113,9 +157,9 @@ vector<double> KinodynamicAstarGridMap::quartic(double a, double b, double c,
 
   return dts;
 }
-vector<double> KinodynamicAstarGridMap::cubic(double a, double b, double c,
-                                              double d) {
-  vector<double> dts;
+std::vector<double> KinodynamicAstarGridMap::cubic(double a, double b, double c,
+                                                   double d) {
+  std::vector<double> dts;
 
   double a2 = b / a;
   double a1 = c / a;

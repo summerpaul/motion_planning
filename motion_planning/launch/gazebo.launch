@@ -1,0 +1,4 @@
+<launch>
+<include file="$(find p3dx_gazebo)/launch/world.launch"/>
+<include file="$(find p3dx_gazebo)/launch/p3dx.launch"/>
+</launch>

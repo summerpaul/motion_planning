@@ -2,13 +2,14 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-27 15:19:02
+ * @Last Modified time: 2022-09-28 17:09:32
  */
 #ifndef MOTION_PLANNING_COMMON_H_
 #define MOTION_PLANNING_COMMON_H_
 #include <Eigen/Core>
 #include <memory>
 #include <unordered_map>
+#include <vector>
 #define IN_CLOSE_SET 'a'
 #define IN_OPEN_SET 'b'
 #define NOT_EXPAND 'c'
@@ -17,24 +18,24 @@
 namespace motion_planning {
 namespace common {
 
-
-
- 
 struct VehicleState {
-  Eigen::Vector2d position; // x y
-  Eigen::Vector2d speed;    // vx vy
-  Eigen::Vector2d acc;      // ax ay
-  double angular_speed;
-  double angular_acc;
-  int prim; // the motion primitive of the node
-  double theta;
-  double kappa;
+  Eigen::Vector2d position = Eigen::Vector2d::Zero(); // x y
+  Eigen::Vector2d speed = Eigen::Vector2d::Zero();    // vx vy
+  Eigen::Vector2d acc = Eigen::Vector2d::Zero();      // ax ay
+  double angular_speed = 0;
+  double angular_acc = 0;
+  int prim = -1; // the motion primitive of the node
+  double theta = 0;
+  double kappa = 0;
 };
 
 struct StampedVehicleState {
   VehicleState pose;
   double time;
 };
+typedef std::vector<VehicleState> Path;
+typedef std::vector<StampedVehicleState> Trajectory;
+;
 
 struct Node {
   VehicleState state;

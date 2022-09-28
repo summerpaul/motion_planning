@@ -1,0 +1,15 @@
+<launch>
+<node pkg="motion_planning_ros" name="dwa_planner_ros_node" type="dwa_planner_ros_node" output="screen">
+    <param name="map_config_path" value="$(find motion_planning_ros)/map/housemap.json"/>
+    <param name="local_esdf_map_topic_name" value="/local_esdf_map"/>
+    <param name="global_occupancy_grid_map_topic_name" value="/global_occupancy_grid_map"/>
+    <param name="local_occupancy_grid_map_topic_name" value="/local_occupancy_grid_map"/>
+    <param name="laser_scan_topic" value="/p3dx/laser/scan"/>
+    <param name="laser_frame_id" value="lms100"/>
+    <param name="robot_radius" value="0.1"/>
+    <param name="odom_topic" value="p3dx/odom"/>
+
+</node>
+
+
+</launch>

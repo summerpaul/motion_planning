@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-27 18:47:22
+ * @Last Modified time: 2022-09-28 14:02:33
  */
 #ifndef ASTAR_SEARCH_GRID_MAP_ROS_H_
 #define ASTAR_SEARCH_GRID_MAP_ROS_H_
@@ -18,6 +18,7 @@
 #include <memory>
 
 #include "global_planner/astar_search_grid_map.h"
+#include "global_planner/kinodynamic_astar_grid_map.h"
 #include "plan_environment/grid_map.h"
 #include "plan_environment/plan_environment.h"
 #include "ros_viz_tools/ros_viz_tools.h"
@@ -27,9 +28,9 @@ using ros_viz_tools::RosVizTools;
 using namespace motion_planning::plan_environment;
 using namespace motion_planning::global_planner;
 
-class AStarSearchGridMapRos {
+class GlobalPlannerRos {
  public:
-  AStarSearchGridMapRos();
+  GlobalPlannerRos();
   bool init();
 
  private:

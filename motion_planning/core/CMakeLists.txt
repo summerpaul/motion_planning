@@ -2,3 +2,4 @@ project(motion_planning)
 
 add_subdirectory(global_planner)
 add_subdirectory(plan_environment)
+add_subdirectory(local_planner)
