@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-23 14:42:37
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-27 14:12:46
+ * @Last Modified time: 2022-09-28 13:25:39
  */
 #include <stdint.h>
 
@@ -46,18 +46,22 @@ public:
     root_x_ = root_x;
     root_y_ = root_y;
     root_theta_ = root_theta;
-    std::cout << "src mat " << mat << std::endl;
+    origin_ = Eigen::Vector2d{root_x_, root_y_};
+    // std::cout << "src mat " << mat << std::endl;
     cv::Mat mat_color_inversion = mat.clone();
     for (int i = 0; i < mat.rows; i++) {
       for (int j = 0; j < mat.cols; j++) {
-        mat_color_inversion.at<uchar>(i, j) =
-            100 - mat.at<uchar>(i, j) * 100 / 255;
-        mat.at<uchar>(i, j);
+        if (mat.at<uchar>(i, j) > 250) {
+          mat_color_inversion.at<uchar>(i, j) = 0;
+        } else {
+          mat_color_inversion.at<uchar>(i, j) = 100;
+        }
       }
     }
     // cv::bitwise_not(mat, mat_color_inversion);
-    cv::imshow("mat_color_inversion", mat_color_inversion);
-    cv::waitKey(0);
+    // cv::imshow("mat_color_inversion", mat_color_inversion);
+    // cv::waitKey(0);
+    // cv::bitwise_not(mat_color_inversion, mat_color_inversion);
 
     cv::Mat mat_fliped, dilated_image;
     int inf_step = ceil(robot_radius / resolution_);
