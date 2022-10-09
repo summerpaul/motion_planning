@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-08-29 14:25:06
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-08-29 14:27:20
+ * @Last Modified time: 2022-10-08 13:54:41
  */
 #include "polynomial_traj_ros.h"
 

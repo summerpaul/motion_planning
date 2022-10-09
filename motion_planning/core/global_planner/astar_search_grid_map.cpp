@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-27 18:56:01
+ * @Last Modified time: 2022-10-09 10:35:16
  */
 #include "astar_search_grid_map.h"
 
@@ -57,7 +57,7 @@ int AStarSearchGridMap::search(const VehicleState &start_pt,
   cur_node->state = start_pt;
   cur_node->index = start_index;
   cur_node->g_score = 0.0;
-  cur_node->f_score = 5.0 * getDiagHeu(start_pt.position, end_pt.position);
+  cur_node->f_score =  getEuclHeu(start_pt.position, end_pt.position,2.0);
   std::cout << "f_score is " << cur_node->f_score << std::endl;
   cur_node->node_state = IN_OPEN_SET;
   open_set_.push(cur_node);
@@ -95,9 +95,9 @@ int AStarSearchGridMap::search(const VehicleState &start_pt,
       double y = motion[1] * resolution;
       tmp_g_score = sqrt(x * x + y * y) + cur_node->g_score;
       tmp_f_score =
-          tmp_g_score + 5.0 * getDiagHeu(grid_map_ptr_->getCartesianCoordinate(
+          tmp_g_score +  getEuclHeu(grid_map_ptr_->getCartesianCoordinate(
                                              neighbor_index),
-                                         end_pt.position);
+                                         end_pt.position, 2.0);
       if (neighbor == nullptr) {
         neighbor = std::make_shared<Node>();
         neighbor->state.position =
@@ -124,7 +124,7 @@ int AStarSearchGridMap::search(const VehicleState &start_pt,
   }
   return NO_PATH;
 }
-std::vector<VehicleState> AStarSearchGridMap::getPath(const double &delta_t) {
+Path AStarSearchGridMap::getPath(const double &delta_t) {
   std::vector<VehicleState> path;
   for (int i = 0; i < path_nodes_.size(); ++i) {
     path.push_back(path_nodes_[i]->state);

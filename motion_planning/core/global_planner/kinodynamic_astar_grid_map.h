@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-27 09:57:36
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-28 13:48:11
+ * @Last Modified time: 2022-10-09 18:56:35
  */
 #include <stdint.h>
 
@@ -20,6 +20,15 @@ public:
                      const VehicleState &end_pt) override;
   virtual std::vector<VehicleState>
   getPath(const double &delta_t = 0.1) override;
+
+  virtual Path getNodePath() override {
+    std::vector<VehicleState> path;
+    for (int i = 0; i < path_nodes_.size(); ++i) {
+      path.push_back(path_nodes_[i]->state);
+    }
+    path.push_back(end_pt_);
+    return path;
+  }
   virtual void reset() override;
 
   virtual ~KinodynamicAstarGridMap() {}
@@ -33,6 +42,13 @@ private:
   std::vector<double> quartic(double a, double b, double c, double d, double e);
   std::vector<double> cubic(double a, double b, double c, double d);
 
+  // 得到一条到终点的曲线
+  bool computeShotTraj(const VehicleState &state1, const VehicleState &state2,
+                       const double &time_to_goal);
+  void stateTransit(VehicleState &state0, VehicleState &state1,
+                    const Eigen::Vector2d &um, const double &tau);
+  void retrievePath(NodePtr end_node);
+
 private:
   GridMap::Ptr grid_map_ptr_;
   VehicleState end_pt_;
@@ -41,6 +57,12 @@ private:
   std::vector<NodePtr> path_nodes_;
   Eigen::Vector2d start_val_;
   Eigen::Vector2d start_acc_;
+  bool is_shot_succ_{false};
+  Eigen::Vector2d end_vel_;
+  Eigen::MatrixXd coef_shot_;
+  double t_shot_;
+  double max_vel_{1.5}, max_acc_{3.0}, max_tau_{0.6}, check_num_{10};
+  Eigen::Matrix<double, 4, 4> phi_; // state transit matrix
 };
 } // namespace global_planner
 } // namespace motion_planning

@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-28 14:04:22
+ * @Last Modified time: 2022-10-09 19:04:02
  */
 /**
  * @Author: Yunkai Xia
@@ -15,19 +15,11 @@
 GlobalPlannerRos::GlobalPlannerRos() : pnh_("~") {}
 bool GlobalPlannerRos::init() {
   std::string global_pcd_map_topic_name;
-  std::string global_occupancy_grid_map_topic_name;
   std::string global_path_topic_name;
   std::string planner_type;
   pnh_.param<std::string>("global_pcd_map_topic_name",
                           global_pcd_map_topic_name,
                           "/map_generator/global_cloud");
-
-  pnh_.param<std::string>("global_occupancy_grid_map_topic_name",
-                          global_occupancy_grid_map_topic_name,
-                          "/global_occupancy_grid_map");
-
-  pnh_.param<std::string>("global_path_topic_name", global_path_topic_name,
-                          "/global_path");
   pnh_.param<std::string>("planner_type", planner_type,
                           "astar_search_grid_map");
 
@@ -39,21 +31,21 @@ bool GlobalPlannerRos::init() {
 
   goal_pose_sub_ = nh_.subscribe("/move_base_simple/goal", 50,
                                  &GlobalPlannerRos::rvizGoalPoseCallback, this);
-
-  global_occupancy_grid_map_pub_ = nh_.advertise<nav_msgs::OccupancyGrid>(
-      global_occupancy_grid_map_topic_name, 1);
-
-  global_path_pub_ = nh_.advertise<nav_msgs::Path>(global_path_topic_name, 1);
   global_gridmap_ptr_ = std::make_shared<GridMap>();
 
   plan_env_ptr_ = std::make_shared<PlanEnvrionment>();
   if (planner_type == "astar_search_grid_map") {
     global_planner_ptr_ = std::make_shared<AStarSearchGridMap>();
     std::cout << "create astar_search_grid_map " << std::endl;
+  } else if (planner_type == "min_collision_risk_planner") {
+    global_planner_ptr_ = std::make_shared<MinCollisionRiskPlanner>();
+    std::cout << "create min_collision_risk_planner " << std::endl;
   } else if (planner_type == "kinodynamic_astar_grid_map") {
     global_planner_ptr_ = std::make_shared<KinodynamicAstarGridMap>();
     std::cout << "create kinodynamic_astar_grid_map " << std::endl;
-  } else {
+  } 
+  
+  else {
     return false;
   }
 
@@ -73,9 +65,8 @@ void GlobalPlannerRos::globalPcdMapCallback(
     is_create_grid_map = true;
     std::cout << "createGridMap" << std::endl;
   }
+  visualizer_.globalGridMapVis(global_gridmap_ptr_);
 
-  auto msg = gridmaptoRosMessage(*global_gridmap_ptr_);
-  global_occupancy_grid_map_pub_.publish(msg);
 
   if (!receive_glocal_map_flag_) {
     receive_glocal_map_flag_ = true;
@@ -95,33 +86,6 @@ void GlobalPlannerRos::globalPcdMapCallback(
     std::cout << "init global planner " << std::endl;
   }
 }
-nav_msgs::OccupancyGrid
-GlobalPlannerRos::gridmaptoRosMessage(const GridMap &gridmap) {
-  nav_msgs::OccupancyGrid occupancy_grid;
-  geometry_msgs::Pose pose;
-  pose.position.x = gridmap.getRootX();
-  pose.position.y = gridmap.getRootY();
-  pose.orientation.z = sin(gridmap.getRootTheta() * 0.5);
-  pose.orientation.w = cos(gridmap.getRootTheta() * 0.5);
-  occupancy_grid.info.map_load_time = ros::Time::now();
-  occupancy_grid.header.frame_id = "map";
-  occupancy_grid.header.stamp = ros::Time::now();
-  std::vector<int8_t> out_data;
-  for (auto meta_data : gridmap.data()) {
-    if (meta_data == 255) {
-      out_data.push_back(100);
-    } else {
-      out_data.push_back(0);
-    }
-  }
-  occupancy_grid.data = out_data;
-  occupancy_grid.info.resolution = gridmap.getResolution();
-  occupancy_grid.info.width = gridmap.getWidth();
-  occupancy_grid.info.height = gridmap.getHeight();
-  occupancy_grid.info.origin = pose;
-  return occupancy_grid;
-}
-
 void GlobalPlannerRos::rvizStartPoseCallback(
     const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg) {
   start_pt_.position[0] = msg->pose.pose.position.x;
@@ -151,20 +115,8 @@ void GlobalPlannerRos::rvizGoalPoseCallback(
   auto global_search_path = global_planner_ptr_->getPath();
   std::cout << "global_search_path size is " << global_search_path.size()
             << std::endl;
-  globalPathVisPub(global_search_path);
-}
+  visualizer_.routeResultVis(global_search_path);
 
-void GlobalPlannerRos::globalPathVisPub(
-    const std::vector<VehicleState> &global_path) {
-  nav_msgs::Path global_path_vis;
-  global_path_vis.header.frame_id = "map";
-  global_path_vis.header.stamp = ros::Time::now();
-  geometry_msgs::PoseStamped path_point;
-  for (auto point : global_path) {
-    path_point.pose.position.x = point.position[0];
-    path_point.pose.position.y = point.position[1];
-    path_point.pose.position.z = 0.2;
-    global_path_vis.poses.push_back(path_point);
-  }
-  global_path_pub_.publish(global_path_vis);
+  auto way_points = global_planner_ptr_->getNodePath();
+  visualizer_.wayPointsVis(way_points);
 }

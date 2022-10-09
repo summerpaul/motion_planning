@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-28 18:16:12
+ * @Last Modified time: 2022-10-09 18:53:56
  */
 #ifndef MOTION_PLANNING_GLOBAL_PLANNER_INTERFACE_H_
 #define MOTION_PLANNING_GLOBAL_PLANNER_INTERFACE_H_
@@ -19,7 +19,8 @@ class GlobalPlannerInterface {
  public:
   virtual ~GlobalPlannerInterface() {}
   virtual int search(const VehicleState& start_pt, const VehicleState& end_pt) = 0;
-  virtual std::vector<VehicleState> getPath(const double& delta_t = 0.1) = 0;
+  virtual Path getPath(const double& delta_t = 0.1) = 0;
+  virtual Path getNodePath() = 0;
   virtual void reset() = 0;
   virtual void setPlanEnvrionment(const PlanEnvrionment::Ptr& plan_env) = 0;
   typedef std::unique_ptr<GlobalPlannerInterface> Ptr;

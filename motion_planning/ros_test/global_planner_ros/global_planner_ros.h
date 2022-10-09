@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-28 14:02:33
+ * @Last Modified time: 2022-10-09 18:45:32
  */
 #ifndef ASTAR_SEARCH_GRID_MAP_ROS_H_
 #define ASTAR_SEARCH_GRID_MAP_ROS_H_
@@ -17,39 +17,38 @@
 
 #include <memory>
 
+#include "common/time.h"
 #include "global_planner/astar_search_grid_map.h"
 #include "global_planner/kinodynamic_astar_grid_map.h"
+#include "global_planner/min_collision_risk_planner.h"
 #include "plan_environment/grid_map.h"
 #include "plan_environment/plan_environment.h"
 #include "ros_viz_tools/ros_viz_tools.h"
-#include "common/time.h"
+#include "visualizer.h"
 using ros_viz_tools::ColorMap;
 using ros_viz_tools::RosVizTools;
 using namespace motion_planning::plan_environment;
 using namespace motion_planning::global_planner;
 
 class GlobalPlannerRos {
- public:
+public:
   GlobalPlannerRos();
   bool init();
 
- private:
-  void globalPcdMapCallback(const sensor_msgs::PointCloud2::ConstPtr& pcd_map);
-  nav_msgs::OccupancyGrid gridmaptoRosMessage(const GridMap& gridmap);
+private:
+  void globalPcdMapCallback(const sensor_msgs::PointCloud2::ConstPtr &pcd_map);
   void rvizStartPoseCallback(
-      const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg);
-  void rvizGoalPoseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
-  void globalPathVisPub(const std::vector<VehicleState>& global_path);
+      const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
+  void rvizGoalPoseCallback(const geometry_msgs::PoseStamped::ConstPtr &msg);
 
- private:
+private:
   GridMap::Ptr global_gridmap_ptr_;
   PlanEnvrionment::Ptr plan_env_ptr_;
   std::shared_ptr<GlobalPlannerInterface> global_planner_ptr_;
+  Visualizer visualizer_;
   ros::NodeHandle nh_;
   ros::NodeHandle pnh_;
   ros::Subscriber global_pcd_map_sub_;
-  ros::Publisher global_occupancy_grid_map_pub_;
-  ros::Publisher global_path_pub_;
   ros::Subscriber start_pose_sub_;
   ros::Subscriber goal_pose_sub_;
   bool receive_glocal_map_flag_{false};

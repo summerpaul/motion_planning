@@ -2,14 +2,13 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-26 09:54:11
+ * @Last Modified time: 2022-10-08 09:59:38
  */
 #ifndef MOTION_PLANNING_SPLINE_H_
 #define MOTION_PLANNING_SPLINE_H_
 #include <Eigen/Eigen>
 #include <vector>
-namespace motion_planning {
-namespace common {
+namespace motion_planning::common {
 
 using Vec_d = std::vector<double>;
 
@@ -32,7 +31,7 @@ inline Vec_d cum_sum(Vec_d input) {
 };
 
 class Spline {
- public:
+public:
   Vec_d x;
   Vec_d y;
   int nx;
@@ -50,7 +49,7 @@ class Spline {
     Eigen::MatrixXd A = calc_A();
     Eigen::VectorXd B = calc_B();
     Eigen::VectorXd c_eigen = A.colPivHouseholderQr().solve(B);
-    double* c_pointer = c_eigen.data();
+    double *c_pointer = c_eigen.data();
     // Eigen::Map<Eigen::VectorXd>(c, c_eigen.rows(), 1) = c_eigen;
     c.assign(c_pointer, c_pointer + c_eigen.rows());
 
@@ -92,7 +91,7 @@ class Spline {
     return 2 * c[seg_id] + 6 * d[seg_id] * dx;
   }
 
- private:
+private:
   Eigen::MatrixXd calc_A() {
     Eigen::MatrixXd A = Eigen::MatrixXd::Zero(nx, nx);
     A(0, 0) = 1;
@@ -130,18 +129,17 @@ class Spline {
 };
 
 class Spline2D {
- public:
+public:
   Spline sx;
   Spline sy;
   Vec_d s;
-  Spline2D(){}
+  Spline2D() {}
 
   Spline2D(Vec_d x, Vec_d y) {
     s = calc_s(x, y);
     sx = Spline(s, x);
     sy = Spline(s, y);
   };
-
 
   Eigen::Vector2d calc_postion(double s_t) {
     double x = sx.calc(s_t);
@@ -163,7 +161,7 @@ class Spline2D {
     return std::atan2(dy, dx);
   };
 
- private:
+private:
   Vec_d calc_s(Vec_d x, Vec_d y) {
     Vec_d ds;
     Vec_d out_s{0};
@@ -180,6 +178,5 @@ class Spline2D {
   };
 };
 
-}  // namespace common
-}  // namespace motion_planning
-#endif  // MOTION_PLANNING_SPLINE_H_
+} // namespace motion_planning::common
+#endif // MOTION_PLANNING_SPLINE_H_

@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-08-24 10:07:35
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-27 11:21:29
+ * @Last Modified time: 2022-10-09 10:07:03
  */
 
 #include "gridmap_ros.h"
@@ -11,19 +11,11 @@ GridmapRos::~GridmapRos() {}
 bool GridmapRos::init() {
   std::string local_pcd_map_topic_name;
   std::string global_pcd_map_topic_name;
-  std::string local_occupancy_grid_map_topic_name;
-  std::string global_occupancy_grid_map_topic_name;
   pnh_.param<std::string>("local_pcd_map_topic_name", local_pcd_map_topic_name,
                           "/map_generator/local_cloud");
   pnh_.param<std::string>("global_pcd_map_topic_name",
                           global_pcd_map_topic_name,
                           "/map_generator/global_cloud");
-  pnh_.param<std::string>("local_occupancy_grid_map_topic_name",
-                          local_occupancy_grid_map_topic_name,
-                          "/local_occupancy_grid_map");
-  pnh_.param<std::string>("global_occupancy_grid_map_topic_name",
-                          global_occupancy_grid_map_topic_name,
-                          "/global_occupancy_grid_map");
 
   pnh_.param<bool>("save_global_map", save_global_map_, false);
   pnh_.param<std::string>("map_path", map_path_, "");
@@ -31,10 +23,6 @@ bool GridmapRos::init() {
                                      &GridmapRos::localPcdMapCallback, this);
   global_pcd_map_sub_ = nh_.subscribe(global_pcd_map_topic_name, 50,
                                       &GridmapRos::globalPcdMapCallback, this);
-  local_occupancy_grid_map_pub_ = nh_.advertise<nav_msgs::OccupancyGrid>(
-      local_occupancy_grid_map_topic_name, 1);
-  global_occupancy_grid_map_pub_ = nh_.advertise<nav_msgs::OccupancyGrid>(
-      global_occupancy_grid_map_topic_name, 1);
 
   click_pose_sub_ =
       nh_.subscribe("/initialpose", 50, &GridmapRos::rvizPoseCallback, this);
@@ -50,8 +38,7 @@ void GridmapRos::localPcdMapCallback(
     local_gridmap_ptr_ = std::make_shared<GridMap>();
   }
   local_gridmap_ptr_->createGridMap(cloud, 0.05, 0.5);
-  auto msg = gridmaptoRosMessage(*local_gridmap_ptr_);
-  local_occupancy_grid_map_pub_.publish(msg);
+  visualizer_.localGridMapVis(local_gridmap_ptr_);
 }
 void GridmapRos::globalPcdMapCallback(
     const sensor_msgs::PointCloud2::ConstPtr &pcd_map) {
@@ -67,13 +54,12 @@ void GridmapRos::globalPcdMapCallback(
     global_gridmap_ptr_->createGridMap(cloud);
     is_create_grid_map = true;
   }
-  auto msg = gridmaptoRosMessage(*global_gridmap_ptr_);
-  global_occupancy_grid_map_pub_.publish(msg);
+  visualizer_.globalGridMapVis(global_gridmap_ptr_);
   static bool saved_map = false;
   if (save_global_map_ && !saved_map) {
     auto map = global_gridmap_ptr_->toImage();
-    std::string map_path = map_path_ + "/map.jpg";
-    cv::imwrite(map_path, map);
+    // std::string map_path = map_path_ + "/map.jpg";
+    // cv::imwrite(map_path, map);
     saved_map = true;
     std::ofstream ofs(map_path_ + "/map.yaml");
     ofs << "image: map.png" << std::endl;
@@ -85,43 +71,16 @@ void GridmapRos::globalPcdMapCallback(
     ofs << "free_thresh: 0.2" << std::endl;
     ofs << "negate: 0" << std::endl;
     auto mat = global_gridmap_ptr_->toImage();
-    cv::namedWindow("Display window",
-                    cv::WINDOW_AUTOSIZE); // Create a window for display.
-    cv::imshow("Display window", mat);    // Show our image inside it.
-    cv::waitKey(0);
+    // cv::namedWindow("Display window",
+    //                 cv::WINDOW_AUTOSIZE); // Create a window for display.
+    // cv::imshow("Display window", mat);    // Show our image inside it.
+    // cv::waitKey(0);
 
     cv::Mat _distField;
     global_gridmap_ptr_->computeDistanceField(mat, _distField);
-    cv::imshow("Display window", _distField); // Show our image inside it.
-    cv::waitKey(0);
   }
 }
-nav_msgs::OccupancyGrid
-GridmapRos::gridmaptoRosMessage(const GridMap &gridmap) {
-  nav_msgs::OccupancyGrid occupancy_grid;
-  geometry_msgs::Pose pose;
-  pose.position.x = gridmap.getRootX();
-  pose.position.y = gridmap.getRootY();
-  pose.orientation.z = sin(gridmap.getRootTheta() * 0.5);
-  pose.orientation.w = cos(gridmap.getRootTheta() * 0.5);
-  occupancy_grid.info.map_load_time = ros::Time::now();
-  occupancy_grid.header.frame_id = "map";
-  occupancy_grid.header.stamp = ros::Time::now();
-  std::vector<int8_t> out_data;
-  for (auto meta_data : gridmap.data()) {
-    if (meta_data == 255) {
-      out_data.push_back(100);
-    } else {
-      out_data.push_back(0);
-    }
-  }
-  occupancy_grid.data = out_data;
-  occupancy_grid.info.resolution = gridmap.getResolution();
-  occupancy_grid.info.width = gridmap.getWidth();
-  occupancy_grid.info.height = gridmap.getHeight();
-  occupancy_grid.info.origin = pose;
-  return occupancy_grid;
-}
+
 void GridmapRos::rvizPoseCallback(
     const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg) {
   if (!global_gridmap_ptr_) {

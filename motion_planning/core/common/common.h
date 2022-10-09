@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-28 17:09:32
+ * @Last Modified time: 2022-10-08 09:57:53
  */
 #ifndef MOTION_PLANNING_COMMON_H_
 #define MOTION_PLANNING_COMMON_H_
@@ -15,8 +15,7 @@
 #define NOT_EXPAND 'c'
 #define inf 1 >> 30
 
-namespace motion_planning {
-namespace common {
+namespace motion_planning::common {
 
 struct VehicleState {
   Eigen::Vector2d position = Eigen::Vector2d::Zero(); // x y
@@ -123,6 +122,5 @@ static double getEuclHeu(const Eigen::Vector2d &x1, const Eigen::Vector2d &x2,
                          const double &tie_breaker = 1.001) {
   return tie_breaker * (x2 - x1).norm();
 }
-} // namespace common
-} // namespace motion_planning
+} // namespace motion_planning::common
 #endif

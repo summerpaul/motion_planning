@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-26 09:54:09
+ * @Last Modified time: 2022-10-08 09:58:41
  */
 #ifndef MOTION_PLANNING_POLYNOMIAL_TRAJ_H_
 #define MOTION_PLANNING_POLYNOMIAL_TRAJ_H_
@@ -10,8 +10,7 @@
 #include <iostream>
 #include <vector>
 // 参考faster planner的多项式
-namespace motion_planning {
-namespace common {
+namespace motion_planning::common {
 using std::vector;
 class PolynomialTraj {
 public:
@@ -461,6 +460,5 @@ private:
   double length;
 };
 
-} // namespace common
-} // namespace motion_planning
+} // namespace motion_planning::common
 #endif // MOTION_PLANNING_POLYNOMIAL_TRAJ_H_

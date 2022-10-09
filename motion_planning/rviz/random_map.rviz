@@ -9,9 +9,12 @@ Panels:
         - /PointCloud21
         - /PointCloud22
         - /PoseWithCovariance1
+        - /Map1
         - /Map2
-        - /Path1
         - /Map3
+        - /MarkerArray4
+        - /MarkerArray4/Namespaces1
+        - /Marker1
       Splitter Ratio: 0.5
     Tree Height: 719
   - Class: rviz/Selection
@@ -161,7 +164,7 @@ Visualization Manager:
       Draw Behind: false
       Enabled: true
       Name: Map
-      Topic: /global_occupancy_grid_map
+      Topic: /global_local_map
       Unreliable: false
       Use Timestamp: false
       Value: true
@@ -171,33 +174,9 @@ Visualization Manager:
       Draw Behind: false
       Enabled: true
       Name: Map
-      Topic: /local_occupancy_grid_map
+      Topic: /local_grid_map
       Unreliable: false
       Use Timestamp: false
-      Value: true
-    - Alpha: 1
-      Buffer Length: 1
-      Class: rviz/Path
-      Color: 52; 101; 164
-      Enabled: true
-      Head Diameter: 0.30000001192092896
-      Head Length: 0.20000000298023224
-      Length: 0.30000001192092896
-      Line Style: Billboards
-      Line Width: 0.029999999329447746
-      Name: Path
-      Offset:
-        X: 0
-        Y: 0
-        Z: 0
-      Pose Color: 255; 85; 255
-      Pose Style: None
-      Queue Size: 10
-      Radius: 0.029999999329447746
-      Shaft Diameter: 0.10000000149011612
-      Shaft Length: 0.10000000149011612
-      Topic: /global_path
-      Unreliable: false
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
@@ -329,7 +308,7 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: false
-      Enabled: true
+      Enabled: false
       Keep: 1
       Name: Odometry
       Position Tolerance: 0.10000000149011612
@@ -346,402 +325,30 @@ Visualization Manager:
         Value: Arrow
       Topic: /p3dx/odom
       Unreliable: false
-      Value: true
+      Value: false
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /voronoi_path
       Name: MarkerArray
       Namespaces:
-        lane0: true
-        lane0points: true
-        lane1: true
-        lane10: true
-        lane100: true
-        lane100points: true
-        lane101: true
-        lane101points: true
-        lane102: true
-        lane102points: true
-        lane103: true
-        lane103points: true
-        lane104: true
-        lane104points: true
-        lane105: true
-        lane105points: true
-        lane106: true
-        lane106points: true
-        lane107: true
-        lane107points: true
-        lane108: true
-        lane108points: true
-        lane109: true
-        lane109points: true
-        lane10points: true
-        lane11: true
-        lane110: true
-        lane110points: true
-        lane111: true
-        lane111points: true
-        lane112: true
-        lane112points: true
-        lane113: true
-        lane113points: true
-        lane114: true
-        lane114points: true
-        lane115: true
-        lane115points: true
-        lane116: true
-        lane116points: true
-        lane117: true
-        lane117points: true
-        lane118: true
-        lane118points: true
-        lane119: true
-        lane119points: true
-        lane11points: true
-        lane12: true
-        lane120: true
-        lane120points: true
-        lane121: true
-        lane121points: true
-        lane122: true
-        lane122points: true
-        lane123: true
-        lane123points: true
-        lane124: true
-        lane124points: true
-        lane125: true
-        lane125points: true
-        lane126: true
-        lane126points: true
-        lane127: true
-        lane127points: true
-        lane128: true
-        lane128points: true
-        lane129: true
-        lane129points: true
-        lane12points: true
-        lane13: true
-        lane130: true
-        lane130points: true
-        lane131: true
-        lane131points: true
-        lane132: true
-        lane132points: true
-        lane133: true
-        lane133points: true
-        lane134: true
-        lane134points: true
-        lane135: true
-        lane135points: true
-        lane136: true
-        lane136points: true
-        lane137: true
-        lane137points: true
-        lane138: true
-        lane138points: true
-        lane139: true
-        lane139points: true
-        lane13points: true
-        lane14: true
-        lane140: true
-        lane140points: true
-        lane141: true
-        lane141points: true
-        lane142: true
-        lane142points: true
-        lane143: true
-        lane143points: true
-        lane144: true
-        lane144points: true
-        lane145: true
-        lane145points: true
-        lane146: true
-        lane146points: true
-        lane147: true
-        lane147points: true
-        lane148: true
-        lane148points: true
-        lane149: true
-        lane149points: true
-        lane14points: true
-        lane15: true
-        lane150: true
-        lane150points: true
-        lane151: true
-        lane151points: true
-        lane152: true
-        lane152points: true
-        lane153: true
-        lane153points: true
-        lane154: true
-        lane154points: true
-        lane155: true
-        lane155points: true
-        lane156: true
-        lane156points: true
-        lane157: true
-        lane157points: true
-        lane158: true
-        lane158points: true
-        lane159: true
-        lane159points: true
-        lane15points: true
-        lane16: true
-        lane160: true
-        lane160points: true
-        lane161: true
-        lane161points: true
-        lane162: true
-        lane162points: true
-        lane163: true
-        lane163points: true
-        lane164: true
-        lane164points: true
-        lane165: true
-        lane165points: true
-        lane166: true
-        lane166points: true
-        lane167: true
-        lane167points: true
-        lane168: true
-        lane168points: true
-        lane169: true
-        lane169points: true
-        lane16points: true
-        lane17: true
-        lane170: true
-        lane170points: true
-        lane171: true
-        lane171points: true
-        lane172: true
-        lane172points: true
-        lane173: true
-        lane173points: true
-        lane174: true
-        lane174points: true
-        lane175: true
-        lane175points: true
-        lane176: true
-        lane176points: true
-        lane177: true
-        lane177points: true
-        lane178: true
-        lane178points: true
-        lane179: true
-        lane179points: true
-        lane17points: true
-        lane18: true
-        lane180: true
-        lane180points: true
-        lane181: true
-        lane181points: true
-        lane182: true
-        lane182points: true
-        lane183: true
-        lane183points: true
-        lane184: true
-        lane184points: true
-        lane185: true
-        lane185points: true
-        lane186: true
-        lane186points: true
-        lane187: true
-        lane187points: true
-        lane188: true
-        lane188points: true
-        lane189: true
-        lane189points: true
-        lane18points: true
-        lane19: true
-        lane190: true
-        lane190points: true
-        lane191: true
-        lane191points: true
-        lane192: true
-        lane192points: true
-        lane193: true
-        lane193points: true
-        lane194: true
-        lane194points: true
-        lane19points: true
-        lane1points: true
-        lane2: true
-        lane20: true
-        lane20points: true
-        lane21: true
-        lane21points: true
-        lane22: true
-        lane22points: true
-        lane23: true
-        lane23points: true
-        lane24: true
-        lane24points: true
-        lane25: true
-        lane25points: true
-        lane26: true
-        lane26points: true
-        lane27: true
-        lane27points: true
-        lane28: true
-        lane28points: true
-        lane29: true
-        lane29points: true
-        lane2points: true
-        lane3: true
-        lane30: true
-        lane30points: true
-        lane31: true
-        lane31points: true
-        lane32: true
-        lane32points: true
-        lane33: true
-        lane33points: true
-        lane34: true
-        lane34points: true
-        lane35: true
-        lane35points: true
-        lane36: true
-        lane36points: true
-        lane37: true
-        lane37points: true
-        lane38: true
-        lane38points: true
-        lane39: true
-        lane39points: true
-        lane3points: true
-        lane4: true
-        lane40: true
-        lane40points: true
-        lane41: true
-        lane41points: true
-        lane42: true
-        lane42points: true
-        lane43: true
-        lane43points: true
-        lane44: true
-        lane44points: true
-        lane45: true
-        lane45points: true
-        lane46: true
-        lane46points: true
-        lane47: true
-        lane47points: true
-        lane48: true
-        lane48points: true
-        lane49: true
-        lane49points: true
-        lane4points: true
-        lane5: true
-        lane50: true
-        lane50points: true
-        lane51: true
-        lane51points: true
-        lane52: true
-        lane52points: true
-        lane53: true
-        lane53points: true
-        lane54: true
-        lane54points: true
-        lane55: true
-        lane55points: true
-        lane56: true
-        lane56points: true
-        lane57: true
-        lane57points: true
-        lane58: true
-        lane58points: true
-        lane59: true
-        lane59points: true
-        lane5points: true
-        lane6: true
-        lane60: true
-        lane60points: true
-        lane61: true
-        lane61points: true
-        lane62: true
-        lane62points: true
-        lane63: true
-        lane63points: true
-        lane64: true
-        lane64points: true
-        lane65: true
-        lane65points: true
-        lane66: true
-        lane66points: true
-        lane67: true
-        lane67points: true
-        lane68: true
-        lane68points: true
-        lane69: true
-        lane69points: true
-        lane6points: true
-        lane7: true
-        lane70: true
-        lane70points: true
-        lane71: true
-        lane71points: true
-        lane72: true
-        lane72points: true
-        lane73: true
-        lane73points: true
-        lane74: true
-        lane74points: true
-        lane75: true
-        lane75points: true
-        lane76: true
-        lane76points: true
-        lane77: true
-        lane77points: true
-        lane78: true
-        lane78points: true
-        lane79: true
-        lane79points: true
-        lane7points: true
-        lane8: true
-        lane80: true
-        lane80points: true
-        lane81: true
-        lane81points: true
-        lane82: true
-        lane82points: true
-        lane83: true
-        lane83points: true
-        lane84: true
-        lane84points: true
-        lane85: true
-        lane85points: true
-        lane86: true
-        lane86points: true
-        lane87: true
-        lane87points: true
-        lane88: true
-        lane88points: true
-        lane89: true
-        lane89points: true
-        lane8points: true
-        lane9: true
-        lane90: true
-        lane90points: true
-        lane91: true
-        lane91points: true
-        lane92: true
-        lane92points: true
-        lane93: true
-        lane93points: true
-        lane94: true
-        lane94points: true
-        lane95: true
-        lane95points: true
-        lane96: true
-        lane96points: true
-        lane97: true
-        lane97points: true
-        lane98: true
-        lane98points: true
-        lane99: true
-        lane99points: true
-        lane9points: true
+        {}
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /route_result
+      Name: MarkerArray
+      Namespaces:
+        path: true
+        points: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /way_points
+      Name: Marker
+      Namespaces:
+        obstacles: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -771,7 +378,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: 0.019999854266643524
+      Angle: -1.3400120735168457
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -781,18 +388,18 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 24.251529693603516
+      Scale: -38.58158874511719
       Target Frame: <Fixed Frame>
-      X: 2.1248960494995117
-      Y: -0.5025808811187744
+      X: -12.096701622009277
+      Y: 2.674962282180786
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: false
+    collapsed: true
   Height: 1016
-  Hide Left Dock: false
-  Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000002610000035afc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d0000035a000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f0000035afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d0000035a000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007800000003efc0100000002fb0000000800540069006d0065010000000000000780000003bc00fffffffb0000000800540069006d00650100000000000004500000000000000000000004040000035a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Hide Left Dock: true
+  Hide Right Dock: true
+  QMainWindow State: 000000ff00000000fd0000000400000000000002610000035afc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073000000003d0000035a000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f0000035afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d0000035a000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007800000003efc0100000002fb0000000800540069006d0065010000000000000780000003bc00fffffffb0000000800540069006d00650100000000000004500000000000000000000007800000035a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -800,7 +407,7 @@ Window Geometry:
   Tool Properties:
     collapsed: false
   Views:
-    collapsed: false
+    collapsed: true
   Width: 1920
   X: 0
   Y: 27

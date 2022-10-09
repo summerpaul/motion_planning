@@ -2,15 +2,14 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-23 14:12:42
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-23 15:49:34
+ * @Last Modified time: 2022-10-08 09:58:14
  */
 
 #ifndef MOTION_PLANNING_MATH_H_
 #define MOTION_PLANNING_MATH_H_
 #include <cmath>
 // 基本数学工具
-namespace motion_planning {
-namespace common {
+namespace motion_planning::common {
 // 角度转弧度
 constexpr double degToRad(double deg) { return M_PI * deg / 180.; }
 // 弧度转角度
@@ -49,7 +48,6 @@ static int sign(double num) {
 }
 // 二维坐标变换
 
-} // namespace common
-} // namespace motion_planning
+} // namespace motion_planning::common
 
 #endif /* __MATH_H__ */

@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-09-30 16:22:44
+ * @Last Modified time: 2022-10-09 18:55:38
  */
 #ifndef MOTION_PLANNING_ASTAR_SEARCH_GRID_MAP_H_
 #define MOTION_PLANNING_ASTAR_SEARCH_GRID_MAP_H_
@@ -10,23 +10,23 @@
 namespace motion_planning {
 namespace global_planner {
 class AStarSearchGridMap : public GlobalPlannerInterface {
- public:
+public:
   AStarSearchGridMap();
-  virtual int search(const VehicleState& start_pt,
-                     const VehicleState& end_pt) override;
-  virtual std::vector<VehicleState> getPath(
-      const double& delta_t = 0.1) override;
+  virtual int search(const VehicleState &start_pt,
+                     const VehicleState &end_pt) override;
+  virtual Path getPath(const double &delta_t = 0.1) override;
   virtual void reset() override;
+  virtual Path getNodePath() override { return getPath(); }
 
   virtual ~AStarSearchGridMap() {}
 
-  virtual void setPlanEnvrionment(
-      const PlanEnvrionment::Ptr& plan_env) override;
+  virtual void
+  setPlanEnvrionment(const PlanEnvrionment::Ptr &plan_env) override;
 
- private:
+private:
   void retrievePath(NodePtr end_node);
 
- private:
+private:
   std::vector<Eigen::Vector2i> motions_;
   GridMap::Ptr grid_map_ptr_;
   VehicleState end_pt_;
@@ -34,6 +34,6 @@ class AStarSearchGridMap : public GlobalPlannerInterface {
   NodeHashTable expanded_nodes_;
   std::vector<NodePtr> path_nodes_;
 };
-}  // namespace global_planner
-}  // namespace motion_planning
-#endif  // MOTION_PLANNING_ASTAR_SEARCH_GRID_MAP_H_
+} // namespace global_planner
+} // namespace motion_planning
+#endif // MOTION_PLANNING_ASTAR_SEARCH_GRID_MAP_H_
