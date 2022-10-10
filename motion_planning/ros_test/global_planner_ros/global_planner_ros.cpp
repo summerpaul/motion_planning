@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-26 08:52:50
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-10-09 19:04:02
+ * @Last Modified time: 2022-10-10 08:58:44
  */
 /**
  * @Author: Yunkai Xia
@@ -43,8 +43,8 @@ bool GlobalPlannerRos::init() {
   } else if (planner_type == "kinodynamic_astar_grid_map") {
     global_planner_ptr_ = std::make_shared<KinodynamicAstarGridMap>();
     std::cout << "create kinodynamic_astar_grid_map " << std::endl;
-  } 
-  
+  }
+
   else {
     return false;
   }
@@ -66,7 +66,6 @@ void GlobalPlannerRos::globalPcdMapCallback(
     std::cout << "createGridMap" << std::endl;
   }
   visualizer_.globalGridMapVis(global_gridmap_ptr_);
-
 
   if (!receive_glocal_map_flag_) {
     receive_glocal_map_flag_ = true;
@@ -91,6 +90,7 @@ void GlobalPlannerRos::rvizStartPoseCallback(
   start_pt_.position[0] = msg->pose.pose.position.x;
   start_pt_.position[1] = msg->pose.pose.position.y;
   start_pt_.theta = tf::getYaw(msg->pose.pose.orientation);
+
   has_start_pt_ = true;
 }
 void GlobalPlannerRos::rvizGoalPoseCallback(

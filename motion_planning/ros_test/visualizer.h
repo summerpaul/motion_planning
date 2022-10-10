@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-10-08 16:21:48
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-10-09 19:10:14
+ * @Last Modified time: 2022-10-10 09:06:40
  */
 #include <stdint.h>
 
@@ -95,14 +95,14 @@ public:
     geometry_msgs::Point point;
     way_points.header.frame_id = frame_id;
     way_points.header.stamp = ros::Time::now();
-    geometry_msgs::Pose pose;
-    pose.position.x = 0.0;
-    pose.position.y = 0.0;
-    pose.position.z = 0.0;
-    pose.orientation.x = 0.0;
-    pose.orientation.y = 0.0;
-    pose.orientation.z = 0.0;
-    pose.orientation.w = 1.0;
+    // geometry_msgs::Pose pose;
+    // pose.position.x = 0.0;
+    // pose.position.y = 0.0;
+    // pose.position.z = 0.0;
+    // pose.orientation.x = 0.0;
+    // pose.orientation.y = 0.0;
+    // pose.orientation.z = 0.0;
+    // pose.orientation.w = 1.0;
     // way_points.pose = pose;
 
     int ob_num = path.size();

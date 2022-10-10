@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-27 09:57:36
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-10-09 18:56:35
+ * @Last Modified time: 2022-10-10 09:49:09
  */
 #include <stdint.h>
 
@@ -25,6 +25,7 @@ public:
     std::vector<VehicleState> path;
     for (int i = 0; i < path_nodes_.size(); ++i) {
       path.push_back(path_nodes_[i]->state);
+      // std::cout << "path_nodes_" << i << "speed is \n" << path_nodes_[i]->state.speed << std::endl;
     }
     path.push_back(end_pt_);
     return path;
@@ -61,8 +62,7 @@ private:
   Eigen::Vector2d end_vel_;
   Eigen::MatrixXd coef_shot_;
   double t_shot_;
-  double max_vel_{1.5}, max_acc_{3.0}, max_tau_{0.6}, check_num_{10};
-  Eigen::Matrix<double, 4, 4> phi_; // state transit matrix
+  double max_vel_{1.5}, max_acc_{2.0}, max_tau_{0.5}, check_num_{10};
 };
 } // namespace global_planner
 } // namespace motion_planning

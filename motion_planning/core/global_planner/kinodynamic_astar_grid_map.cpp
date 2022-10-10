@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-27 15:04:04
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-10-09 18:25:41
+ * @Last Modified time: 2022-10-10 10:35:45
  */
 #include <iostream>
 
@@ -33,6 +33,7 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
   double lambda_heu = 5.0;
   start_val_ = start_pt.speed;
   start_acc_ = start_pt.acc;
+  end_pt_ = end_pt;
   double resolution = grid_map_ptr_->getResolution();
   std::cout << "start kinodynamic search with grid map" << std::endl;
   NodePtr cur_node = std::make_shared<Node>();
@@ -62,9 +63,9 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
     //           << std::endl;
     if (near_end) {
       std::cout << "near_end " << std::endl;
-      
+
       estimateHeuristic(cur_node->state, end_pt, time_to_goal);
-      if(!computeShotTraj(cur_node->state, end_pt, time_to_goal)){
+      if (!computeShotTraj(cur_node->state, end_pt, time_to_goal)) {
         std::cout << "some thing wrong with end ShotTraj " << std::endl;
         return NO_PATH;
       }
@@ -95,17 +96,21 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
     for (int i = 0; i < inputs.size(); ++i)
       for (int j = 0; j < durations.size(); ++j) {
         // std::cout << "um is " << um << std::endl;
+        // 加速度采样
         um = inputs[i];
+        // 时间采样
         double tau = durations[j];
-        // 将装填进行拓展
+        // 将状态进行拓展
         stateTransit(cur_state, pro_state, um, tau);
         // std::cout << "pro state position is " << pro_state.position <<
         // std::endl;
         //拓展的位置在栅格地图中的坐标
         auto neighbor_index =
             grid_map_ptr_->getGridMapIndex(pro_state.position);
+        // 检查拓展点是否在栅格地图中
         if (!grid_map_ptr_->isVerify(neighbor_index))
           continue;
+        // 检查拓展点是否有障碍物
         if (grid_map_ptr_->isOccupied(neighbor_index))
           continue;
         // 查找节点是否在扩展节点中
@@ -116,8 +121,7 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
           continue; // 当拓展的节点在close set中，跳过
         // 速度与加速度检测
         // std::cout << "check speed " << std::endl;
-        if (fabs(pro_state.speed(0)) > max_vel_ ||
-            fabs(pro_state.speed(1)) > max_vel_) {
+        if (pro_state.speed.norm() > max_vel_) {
           continue;
         }
         // Check not in the same voxel
@@ -131,22 +135,23 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
         Eigen::Vector2i pos_index;
         VehicleState xt;
         bool is_occ = false;
-        for (int k = 1; k <= check_num_; ++k) {
-          double dt = tau * double(k) / double(check_num_);
-          stateTransit(cur_state, xt, um, dt);
+        // 检查拓展的路径上有没有障碍物
+        double dt = tau / double(check_num_);
+        for (double t = 0; t <= tau + 1e-3; t += dt) {
+          stateTransit(cur_state, xt, um, t);
           pos_index = grid_map_ptr_->getGridMapIndex(xt.position);
           if (grid_map_ptr_->isOccupied(pos_index)) {
             is_occ = true;
             break;
           }
         }
-        if (is_occ) {
+
+        if (is_occ)
           continue;
-        }
 
         double time_to_goal, tmp_g_score, tmp_f_score;
         // tmp_g_score = (0.5 * (um)*pow(tau, 2)).norm() + cur_node->g_score;
-        tmp_g_score = (um.squaredNorm() + lambda_heu) +  cur_node->g_score;
+        tmp_g_score = (um.squaredNorm() + lambda_heu) + cur_node->g_score;
         // tmp_f_score = tmp_g_score + lambda_heu *
         // getEuclHeu(pro_state.position,
         //                                                     end_pt.position);
@@ -157,7 +162,8 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
         // std::cout << "prune " << std::endl;
 
         bool prune = false;
-        //
+        //剪枝，使得在同一栅格内的数据用一个数据
+        VehicleState test_state;
         for (int j = 0; j < tmp_expand_nodes.size(); ++j) {
           // std::cout << "tmp_expand_nodes.size() size is "
           //           << tmp_expand_nodes.size() << std::endl;
@@ -170,12 +176,14 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
               expand_node->state = pro_state;
               expand_node->input = um;
               expand_node->duration = tau;
+              expand_node->parent = cur_node;
             }
             break;
           }
         }
         if (!prune) {
           // 扩展新的节点
+
           if (neighbor == NULL) {
             neighbor = std::make_shared<Node>();
             neighbor->index = neighbor_index;
@@ -190,6 +198,11 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
             open_set_.push(neighbor);
             expanded_nodes_.insert(neighbor_index, neighbor);
             tmp_expand_nodes.push_back(neighbor);
+            stateTransit(cur_node->state, test_state, um, tau);
+            auto diff = pro_state.position - test_state.position;
+            if (diff.norm() != 0) {
+              std::cout << "!!!!!!!!!!!!!! diff is \n" << diff << std::endl;
+            }
           }
           // 更新节点
           else if (neighbor->node_state == IN_OPEN_SET) {
@@ -199,6 +212,12 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
               neighbor->g_score = tmp_g_score;
               neighbor->input = um;
               neighbor->duration = tau;
+              neighbor->parent = cur_node;
+              stateTransit(cur_node->state, test_state, um, tau);
+              auto diff = pro_state.position - test_state.position;
+              if (diff.norm() != 0) {
+                std::cout << "!!!!!!!!!!!!!! diff is \n" << diff << std::endl;
+              }
             }
           } else {
             std::cout << "error type in searching: " << neighbor->node_state
@@ -217,11 +236,27 @@ KinodynamicAstarGridMap::getPath(const double &delta_t) {
   Path path;
   VehicleState x0, xt;
   while (node->parent != nullptr) {
+    // 当前节点的输入，从
     auto ut = node->input;
+    // 运动的时间
     double duration = node->duration;
+    // 父亲节点
     x0 = node->parent->state;
     for (double t = duration; t >= -1e-5; t -= delta_t) {
+      // 根据时间推测状态
+      // x0,父亲节点状态，倒推
       stateTransit(x0, xt, ut, t);
+      auto pos_index = grid_map_ptr_->getGridMapIndex(xt.position);
+      if (grid_map_ptr_->isOccupied(pos_index)) {
+        std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+      }
+      if (duration == t) {
+        auto diff = xt.position - node->state.position;
+        if (diff.norm() != 0) {
+          std::cout << "diff is \n" << diff << std::endl;
+        }
+      }
+
       path.push_back(xt);
     }
     node = node->parent;
@@ -274,7 +309,9 @@ void KinodynamicAstarGridMap::stateTransit(VehicleState &current_state,
                                            VehicleState &pro_state,
                                            const Eigen::Vector2d &um,
                                            const double &tau) {
+  // 速度更新
   pro_state.speed = current_state.speed + tau * um;
+  // 位置更新
   Eigen::Vector2d dp = 0.5 * (pro_state.speed + current_state.speed) * tau;
   pro_state.position = current_state.position + dp;
 }
