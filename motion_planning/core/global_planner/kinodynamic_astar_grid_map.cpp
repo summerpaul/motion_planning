@@ -2,7 +2,7 @@
  * @Author: Yunkai Xia
  * @Date:   2022-09-27 15:04:04
  * @Last Modified by:   Yunkai Xia
- * @Last Modified time: 2022-10-10 10:35:45
+ * @Last Modified time: 2022-10-10 10:42:10
  */
 #include <iostream>
 
@@ -163,7 +163,6 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
 
         bool prune = false;
         //剪枝，使得在同一栅格内的数据用一个数据
-        VehicleState test_state;
         for (int j = 0; j < tmp_expand_nodes.size(); ++j) {
           // std::cout << "tmp_expand_nodes.size() size is "
           //           << tmp_expand_nodes.size() << std::endl;
@@ -198,11 +197,6 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
             open_set_.push(neighbor);
             expanded_nodes_.insert(neighbor_index, neighbor);
             tmp_expand_nodes.push_back(neighbor);
-            stateTransit(cur_node->state, test_state, um, tau);
-            auto diff = pro_state.position - test_state.position;
-            if (diff.norm() != 0) {
-              std::cout << "!!!!!!!!!!!!!! diff is \n" << diff << std::endl;
-            }
           }
           // 更新节点
           else if (neighbor->node_state == IN_OPEN_SET) {
@@ -213,11 +207,6 @@ int KinodynamicAstarGridMap::search(const VehicleState &start_pt,
               neighbor->input = um;
               neighbor->duration = tau;
               neighbor->parent = cur_node;
-              stateTransit(cur_node->state, test_state, um, tau);
-              auto diff = pro_state.position - test_state.position;
-              if (diff.norm() != 0) {
-                std::cout << "!!!!!!!!!!!!!! diff is \n" << diff << std::endl;
-              }
             }
           } else {
             std::cout << "error type in searching: " << neighbor->node_state
@@ -246,16 +235,6 @@ KinodynamicAstarGridMap::getPath(const double &delta_t) {
       // 根据时间推测状态
       // x0,父亲节点状态，倒推
       stateTransit(x0, xt, ut, t);
-      auto pos_index = grid_map_ptr_->getGridMapIndex(xt.position);
-      if (grid_map_ptr_->isOccupied(pos_index)) {
-        std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-      }
-      if (duration == t) {
-        auto diff = xt.position - node->state.position;
-        if (diff.norm() != 0) {
-          std::cout << "diff is \n" << diff << std::endl;
-        }
-      }
 
       path.push_back(xt);
     }
